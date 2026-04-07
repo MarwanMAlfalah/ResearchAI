@@ -22,6 +22,10 @@ class OpenAlexAPIError(OpenAlexClientError):
     """Raised when OpenAlex returns a non-success response."""
 
 
+class OpenAlexNotFoundError(OpenAlexAPIError):
+    """Raised when the requested OpenAlex entity does not exist."""
+
+
 class OpenAlexClient:
     """Small, testable OpenAlex HTTP client.
 
@@ -90,6 +94,9 @@ class OpenAlexClient:
             logger.error("OpenAlex request timed out", extra={"url": url})
             raise OpenAlexTimeoutError("OpenAlex request timed out") from exc
         except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                logger.info("OpenAlex resource not found", extra={"url": url})
+                raise OpenAlexNotFoundError("OpenAlex resource not found") from exc
             logger.error(
                 "OpenAlex returned non-success status",
                 extra={"url": url, "status_code": exc.response.status_code},

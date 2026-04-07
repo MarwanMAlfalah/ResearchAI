@@ -47,3 +47,13 @@ class PaperImportResult(BaseModel):
     paper_id: str
     authors_merged: int
     topics_merged: int
+    author_ids: list[str] = Field(default_factory=list)
+    topic_names: list[str] = Field(default_factory=list)
+
+
+class OpenAlexPaperImportResponse(BaseModel):
+    """Response payload for direct OpenAlex paper import endpoint."""
+
+    status: str = "imported"
+    openalex_id: str
+    imported: PaperImportResult

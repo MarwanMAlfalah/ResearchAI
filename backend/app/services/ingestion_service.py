@@ -80,19 +80,24 @@ def import_normalized_paper(neo4j_client: Neo4jClient, paper: NormalizedPaper) -
     if not result:
         raise RuntimeError("Neo4j upsert did not return a result")
 
+    author_ids = sorted({a["author_id"] for a in authors if a.get("author_id")})
+    topic_names = sorted({t["name"] for t in topics if t.get("name")})
+
     logger.info(
         "Imported paper into Neo4j",
         extra={
             "paper_id": paper_id,
-            "authors": len(authors),
-            "topics": len(topics),
+            "authors": len(author_ids),
+            "topics": len(topic_names),
         },
     )
 
     return PaperImportResult(
         paper_id=result[0]["paper_id"],
-        authors_merged=len(authors),
-        topics_merged=len(topics),
+        authors_merged=len(author_ids),
+        topics_merged=len(topic_names),
+        author_ids=author_ids,
+        topic_names=topic_names,
     )
 
 
