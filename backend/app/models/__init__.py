@@ -10,6 +10,7 @@ from app.models.ingestion import (
     OpenAlexPaperImportResponse,
     PaperImportResult,
 )
+from app.models.user_profile import UserProfileResponse, UserProfileUpsertRequest
 
 __all__ = [
     "NormalizedAuthor",
@@ -20,4 +21,6 @@ __all__ = [
     "OpenAlexBatchImportRequest",
     "OpenAlexBatchImportItemResult",
     "OpenAlexBatchImportResponse",
+    "UserProfileUpsertRequest",
+    "UserProfileResponse",
 ]
