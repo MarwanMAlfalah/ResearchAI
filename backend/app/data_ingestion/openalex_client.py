@@ -1,0 +1,1 @@
+"""OpenAlex ingestion client placeholder."""

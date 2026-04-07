@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+neo4j
+rdflib
+owlready2
+spacy
+keybert
+sentence-transformers

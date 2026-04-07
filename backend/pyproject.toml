@@ -1,0 +1,8 @@
+[project]
+name = "researchgraph-ai-backend"
+version = "0.1.0"
+description = "Backend service for ResearchGraph AI"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
