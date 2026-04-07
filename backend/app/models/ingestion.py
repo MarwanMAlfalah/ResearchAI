@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -57,3 +57,27 @@ class OpenAlexPaperImportResponse(BaseModel):
     status: str = "imported"
     openalex_id: str
     imported: PaperImportResult
+
+
+class OpenAlexBatchImportRequest(BaseModel):
+    """Request payload for batch direct imports from OpenAlex IDs."""
+
+    openalex_ids: list[str] = Field(default_factory=list)
+
+
+class OpenAlexBatchImportItemResult(BaseModel):
+    """Per-ID result item for batch OpenAlex import operations."""
+
+    openalex_id: str
+    status: Literal["imported", "failed"]
+    reason: str | None = None
+    imported: PaperImportResult | None = None
+
+
+class OpenAlexBatchImportResponse(BaseModel):
+    """Aggregate response payload for batch OpenAlex imports."""
+
+    total: int
+    imported: int
+    failed: int
+    results: list[OpenAlexBatchImportItemResult] = Field(default_factory=list)

@@ -4,6 +4,9 @@ from app.models.ingestion import (
     NormalizedAuthor,
     NormalizedConcept,
     NormalizedPaper,
+    OpenAlexBatchImportItemResult,
+    OpenAlexBatchImportRequest,
+    OpenAlexBatchImportResponse,
     OpenAlexPaperImportResponse,
     PaperImportResult,
 )
@@ -14,4 +17,7 @@ __all__ = [
     "NormalizedPaper",
     "PaperImportResult",
     "OpenAlexPaperImportResponse",
+    "OpenAlexBatchImportRequest",
+    "OpenAlexBatchImportItemResult",
+    "OpenAlexBatchImportResponse",
 ]
