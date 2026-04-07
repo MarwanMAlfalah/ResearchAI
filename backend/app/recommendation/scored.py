@@ -30,6 +30,14 @@ class ScoringContext:
     recency_decay: float
 
 
+@dataclass(frozen=True)
+class CentralityNormalizationContext:
+    """Normalization context for centrality primary/fallback signals."""
+
+    max_citation_degree: float
+    max_cited_by_count: float
+
+
 def recommend_papers_with_scores(
     neo4j_client: Neo4jClient,
     user_id: str,
@@ -51,7 +59,10 @@ def recommend_papers_with_scores(
         recency_decay=settings.recommendation_recency_decay,
     )
 
-    max_degree = _max_citation_degree(candidates)
+    centrality_context = CentralityNormalizationContext(
+        max_citation_degree=_max_citation_degree(candidates),
+        max_cited_by_count=_max_cited_by_count(candidates),
+    )
     scored: list[ScoredPaperRecommendation] = []
 
     for candidate in candidates:
@@ -60,7 +71,7 @@ def recommend_papers_with_scores(
             continue
 
         semantic_similarity = cosine_similarity(user_embedding, paper_embedding)
-        graph_centrality = _graph_centrality_score(candidate.get("citation_degree"), max_degree)
+        graph_centrality = _graph_centrality_score(candidate, centrality_context)
         recency = _recency_score(candidate.get("publication_year"), context)
 
         final_score = (
@@ -96,18 +107,21 @@ def _recency_score(publication_year: Any, context: ScoringContext) -> float:
     return math.exp(-context.recency_decay * age)
 
 
-def _graph_centrality_score(citation_degree: Any, max_degree: float) -> float:
-    """Compute normalized centrality score from citation degree."""
+def _graph_centrality_score(
+    candidate: dict[str, Any],
+    context: CentralityNormalizationContext,
+) -> float:
+    """Compute centrality using CITES degree, with cited_by_count fallback."""
 
-    try:
-        degree = float(citation_degree)
-    except (TypeError, ValueError):
-        degree = 0.0
+    degree = _to_float(candidate.get("citation_degree"))
+    if context.max_citation_degree > 0.0:
+        return _normalize_signal(degree, context.max_citation_degree)
 
-    if max_degree <= 0.0:
-        return 0.0
+    cited_by_count = _to_float(candidate.get("cited_by_count"))
+    if context.max_cited_by_count > 0.0:
+        return _normalize_signal(cited_by_count, context.max_cited_by_count)
 
-    return max(0.0, min(1.0, degree / max_degree))
+    return 0.0
 
 
 def _max_citation_degree(candidates: list[dict[str, Any]]) -> float:
@@ -115,13 +129,38 @@ def _max_citation_degree(candidates: list[dict[str, Any]]) -> float:
 
     max_value = 0.0
     for candidate in candidates:
-        try:
-            degree = float(candidate.get("citation_degree") or 0.0)
-        except (TypeError, ValueError):
-            degree = 0.0
+        degree = _to_float(candidate.get("citation_degree"))
         if degree > max_value:
             max_value = degree
     return max_value
+
+
+def _max_cited_by_count(candidates: list[dict[str, Any]]) -> float:
+    """Find maximum cited_by_count for fallback centrality normalization."""
+
+    max_value = 0.0
+    for candidate in candidates:
+        cited_by_count = _to_float(candidate.get("cited_by_count"))
+        if cited_by_count > max_value:
+            max_value = cited_by_count
+    return max_value
+
+
+def _normalize_signal(value: float, max_value: float) -> float:
+    """Normalize any non-negative signal into [0, 1]."""
+
+    if max_value <= 0.0:
+        return 0.0
+    return max(0.0, min(1.0, value / max_value))
+
+
+def _to_float(value: Any) -> float:
+    """Convert arbitrary value to float with safe default."""
+
+    try:
+        return float(value or 0.0)
+    except (TypeError, ValueError):
+        return 0.0
 
 
 def _to_float_list_or_none(value: Any) -> list[float] | None:

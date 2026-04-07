@@ -39,3 +39,23 @@ class ScoredPaperRecommendationResponse(BaseModel):
     beta: float
     gamma: float
     recommendations: list[ScoredPaperRecommendation] = Field(default_factory=list)
+
+
+class ExplainedPaperRecommendation(BaseModel):
+    """A scored recommendation augmented with deterministic explanation metadata."""
+
+    paper_id: str
+    title: str | None = None
+    semantic_similarity: float
+    graph_centrality: float
+    recency: float
+    final_score: float
+    top_contributing_signals: list[str] = Field(default_factory=list)
+    explanation_text: str
+
+
+class ExplainedPaperRecommendationResponse(BaseModel):
+    """Explained recommendation response for recommendation cards."""
+
+    user_id: str
+    recommendations: list[ExplainedPaperRecommendation] = Field(default_factory=list)
