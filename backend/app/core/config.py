@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     openalex_base_url: str = "https://api.openalex.org"
     openalex_timeout_seconds: float = 10.0
 
+    embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_device: str = "cpu"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
