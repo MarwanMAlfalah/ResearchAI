@@ -1,6 +1,7 @@
 """Application configuration loaded from environment variables."""
 
 from functools import lru_cache
+from datetime import datetime
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -30,6 +31,12 @@ class Settings(BaseSettings):
 
     embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
     embedding_device: str = "cpu"
+
+    recommendation_alpha: float = 0.6
+    recommendation_beta: float = 0.25
+    recommendation_gamma: float = 0.15
+    recommendation_recency_decay: float = 0.25
+    recommendation_current_year: int = Field(default_factory=lambda: datetime.utcnow().year)
 
     model_config = SettingsConfigDict(
         env_file=".env",

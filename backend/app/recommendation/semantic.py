@@ -28,8 +28,8 @@ def recommend_papers_by_semantic_similarity(
 ) -> list[SemanticPaperRecommendation]:
     """Return top-N papers sorted by cosine similarity to user interests embedding."""
 
-    user_embedding = _get_user_embedding(neo4j_client=neo4j_client, user_id=user_id)
-    papers = _get_paper_embeddings(neo4j_client=neo4j_client)
+    user_embedding = get_user_profile_embedding(neo4j_client=neo4j_client, user_id=user_id)
+    papers = get_paper_embedding_candidates(neo4j_client=neo4j_client)
 
     scored: list[SemanticPaperRecommendation] = []
     for paper in papers:
@@ -50,7 +50,7 @@ def recommend_papers_by_semantic_similarity(
     return scored[:limit]
 
 
-def _get_user_embedding(neo4j_client: Neo4jClient, user_id: str) -> list[float]:
+def get_user_profile_embedding(neo4j_client: Neo4jClient, user_id: str) -> list[float]:
     """Fetch user embedding vector from Neo4j and validate availability."""
 
     rows = neo4j_client.run_read_query(
@@ -74,14 +74,23 @@ def _get_user_embedding(neo4j_client: Neo4jClient, user_id: str) -> list[float]:
     return embedding
 
 
-def _get_paper_embeddings(neo4j_client: Neo4jClient) -> list[dict[str, Any]]:
-    """Fetch papers that have stored embeddings."""
+def get_paper_embedding_candidates(neo4j_client: Neo4jClient) -> list[dict[str, Any]]:
+    """Fetch papers with embeddings and graph metadata for scoring."""
 
     return neo4j_client.run_read_query(
         query="""
         MATCH (p:Paper)
         WHERE p.paper_embedding IS NOT NULL
-        RETURN p.paper_id AS paper_id, p.title AS title, p.paper_embedding AS paper_embedding
+        OPTIONAL MATCH (p)<-[:CITES]-(:Paper)
+        WITH p, count(*) AS incoming_citations
+        OPTIONAL MATCH (p)-[:CITES]->(:Paper)
+        WITH p, incoming_citations, count(*) AS outgoing_citations
+        RETURN
+            p.paper_id AS paper_id,
+            p.title AS title,
+            p.paper_embedding AS paper_embedding,
+            p.publication_year AS publication_year,
+            toFloat(incoming_citations + outgoing_citations) AS citation_degree
         """
     )
 

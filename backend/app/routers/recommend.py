@@ -6,8 +6,13 @@ import logging
 
 from fastapi import APIRouter, HTTPException, Query, Request, status
 
+from app.core.config import get_settings
 from app.db.neo4j import Neo4jClient, Neo4jClientError
-from app.models.recommendation import SemanticPaperRecommendationResponse
+from app.models.recommendation import (
+    ScoredPaperRecommendationResponse,
+    SemanticPaperRecommendationResponse,
+)
+from app.recommendation.scored import recommend_papers_with_scores
 from app.recommendation.semantic import (
     UserProfileEmbeddingMissingError,
     UserProfileNotFoundError,
@@ -58,6 +63,56 @@ def get_semantic_paper_recommendations(
         ) from exc
 
     return SemanticPaperRecommendationResponse(user_id=user_id, recommendations=recommendations)
+
+
+@router.get(
+    "/papers/scored",
+    response_model=ScoredPaperRecommendationResponse,
+    summary="Get multi-signal scored paper recommendations",
+)
+def get_scored_paper_recommendations(
+    request: Request,
+    user_id: str = Query(..., min_length=1),
+    limit: int = Query(10, ge=1, le=100),
+) -> ScoredPaperRecommendationResponse:
+    """Return top papers ranked by weighted semantic, centrality, and recency signals."""
+
+    neo4j_client = _get_neo4j_client(request)
+    settings = get_settings()
+
+    try:
+        recommendations = recommend_papers_with_scores(
+            neo4j_client=neo4j_client,
+            user_id=user_id,
+            settings=settings,
+            limit=limit,
+        )
+    except UserProfileNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except UserProfileEmbeddingMissingError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+    except Neo4jClientError as exc:
+        logger.error("Neo4j error while computing scored recommendations: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Neo4j is unavailable",
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
+
+    return ScoredPaperRecommendationResponse(
+        user_id=user_id,
+        alpha=settings.recommendation_alpha,
+        beta=settings.recommendation_beta,
+        gamma=settings.recommendation_gamma,
+        recommendations=recommendations,
+    )
 
 
 def _get_neo4j_client(request: Request) -> Neo4jClient:

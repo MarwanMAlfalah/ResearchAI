@@ -10,7 +10,12 @@ from app.models.ingestion import (
     OpenAlexPaperImportResponse,
     PaperImportResult,
 )
-from app.models.recommendation import SemanticPaperRecommendation, SemanticPaperRecommendationResponse
+from app.models.recommendation import (
+    ScoredPaperRecommendation,
+    ScoredPaperRecommendationResponse,
+    SemanticPaperRecommendation,
+    SemanticPaperRecommendationResponse,
+)
 from app.models.user_profile import UserProfileResponse, UserProfileUpsertRequest
 
 __all__ = [
@@ -26,4 +31,6 @@ __all__ = [
     "UserProfileResponse",
     "SemanticPaperRecommendation",
     "SemanticPaperRecommendationResponse",
+    "ScoredPaperRecommendation",
+    "ScoredPaperRecommendationResponse",
 ]
