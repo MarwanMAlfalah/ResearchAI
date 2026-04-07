@@ -3,6 +3,7 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 python-dotenv
+httpx
 neo4j
 rdflib
 owlready2

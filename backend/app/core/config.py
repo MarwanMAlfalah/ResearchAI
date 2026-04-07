@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     neo4j_password: str = "neo4j"
     neo4j_database: str = "neo4j"
 
+    openalex_base_url: str = "https://api.openalex.org"
+    openalex_timeout_seconds: float = 10.0
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
