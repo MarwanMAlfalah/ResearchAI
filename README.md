@@ -47,3 +47,5 @@ Default frontend URL: `http://localhost:5173`
 ## Status
 
 Initial scaffold is in place. Business logic modules are intentionally placeholders.
+
+## Progressing
