@@ -20,6 +20,11 @@ class Settings(BaseSettings):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
     log_level: str = "INFO"
 
+    neo4j_uri: str = "bolt://localhost:7687"
+    neo4j_username: str = "neo4j"
+    neo4j_password: str = "neo4j"
+    neo4j_database: str = "neo4j"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
