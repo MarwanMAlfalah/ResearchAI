@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 
+import AdvisorPage from "../pages/AdvisorPage";
 import ProfilePage from "../pages/ProfilePage";
 import RecommendationsPage from "../pages/RecommendationsPage";
 import SearchPage from "../pages/SearchPage";
 import SkillGapPage from "../pages/SkillGapPage";
 
-type AppPage = "profile" | "recommendations" | "search" | "skill-gap";
+type AppPage = "profile" | "search" | "recommendations" | "skill-gap" | "advisor";
 
 export default function App(): JSX.Element {
   const [activePage, setActivePage] = useState<AppPage>("profile");
@@ -67,6 +68,15 @@ export default function App(): JSX.Element {
             >
               Skill Gap
             </button>
+            <button
+              type="button"
+              onClick={() => setActivePage("advisor")}
+              className={`btn-nav ${
+                activePage === "advisor" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              }`}
+            >
+              Advisor
+            </button>
           </div>
 
           <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 shadow-sm">
@@ -102,8 +112,10 @@ export default function App(): JSX.Element {
         <RecommendationsPage initialUserId={activeUserId} onUserIdChange={setActiveUserId} />
       ) : activePage === "search" ? (
         <SearchPage activeUserId={activeUserId} />
-      ) : (
+      ) : activePage === "skill-gap" ? (
         <SkillGapPage initialUserId={activeUserId} onUserIdChange={setActiveUserId} />
+      ) : (
+        <AdvisorPage initialUserId={activeUserId} onUserIdChange={setActiveUserId} />
       )}
     </div>
   );
