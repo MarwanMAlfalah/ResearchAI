@@ -2,8 +2,9 @@ import { useState } from "react";
 
 import ProfilePage from "../pages/ProfilePage";
 import RecommendationsPage from "../pages/RecommendationsPage";
+import SearchPage from "../pages/SearchPage";
 
-type AppPage = "profile" | "recommendations";
+type AppPage = "profile" | "recommendations" | "search";
 
 export default function App(): JSX.Element {
   const [activePage, setActivePage] = useState<AppPage>("profile");
@@ -33,6 +34,15 @@ export default function App(): JSX.Element {
           >
             Recommendations
           </button>
+          <button
+            type="button"
+            onClick={() => setActivePage("search")}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              activePage === "search" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            Search
+          </button>
         </div>
       </nav>
 
@@ -42,8 +52,10 @@ export default function App(): JSX.Element {
           onUserIdReady={setActiveUserId}
           onNavigateToRecommendations={() => setActivePage("recommendations")}
         />
-      ) : (
+      ) : activePage === "recommendations" ? (
         <RecommendationsPage initialUserId={activeUserId} onUserIdChange={setActiveUserId} />
+      ) : (
+        <SearchPage />
       )}
     </div>
   );
