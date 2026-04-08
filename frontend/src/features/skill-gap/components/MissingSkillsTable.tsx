@@ -1,7 +1,7 @@
-import type { DerivedSkill } from "../types/skillGap";
+import type { MissingSkillEvidence } from "../types/skillGap";
 
 type MissingSkillsTableProps = {
-  skills: DerivedSkill[];
+  skills: MissingSkillEvidence[];
 };
 
 function confidenceLabel(value: number): string {
@@ -12,9 +12,7 @@ export default function MissingSkillsTable({ skills }: MissingSkillsTableProps):
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="text-base font-semibold text-slate-900">Missing / Recommended Skills</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Initial frontend-derived recommendations based on profile interests and top recommended papers.
-      </p>
+      <p className="mt-1 text-sm text-slate-600">Backend-driven skill gap evidence from profile and recommendations.</p>
 
       {skills.length === 0 ? (
         <p className="mt-4 rounded-lg border border-dashed border-slate-300 px-3 py-4 text-sm text-slate-600">
@@ -38,14 +36,33 @@ export default function MissingSkillsTable({ skills }: MissingSkillsTableProps):
             </thead>
             <tbody>
               {skills.map((skill) => (
-                <tr key={skill.name} className="rounded-lg bg-slate-50 text-slate-800">
-                  <td className="rounded-l-lg px-2 py-2 font-medium">{skill.name}</td>
+                <tr key={skill.skill} className="rounded-lg bg-slate-50 text-slate-800">
+                  <td className="rounded-l-lg px-2 py-2 font-medium">{skill.skill}</td>
                   <td className="px-2 py-2">{confidenceLabel(skill.confidence)}</td>
                   <td className="rounded-r-lg px-2 py-2">{skill.evidence_count}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          <div className="mt-4 grid gap-2">
+            {skills.map((skill) => (
+              <article key={`${skill.skill}-evidence`} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{skill.skill} Rationale</p>
+                <p className="mt-1 text-sm text-slate-700">{skill.rationale}</p>
+                {skill.supporting_papers.length > 0 ? (
+                  <div className="mt-2 text-xs text-slate-600">
+                    <p className="font-medium text-slate-700">Evidence Papers</p>
+                    <p className="mt-1">
+                      {skill.supporting_papers
+                        .map((paper) => `${paper.title ?? paper.paper_id} (score ${paper.final_score.toFixed(3)})`)
+                        .join("; ")}
+                    </p>
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </div>
         </div>
       )}
     </section>

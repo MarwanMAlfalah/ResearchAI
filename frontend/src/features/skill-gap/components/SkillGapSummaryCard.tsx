@@ -1,31 +1,37 @@
-import type { SkillGapSummary } from "../types/skillGap";
-
 type SkillGapSummaryCardProps = {
-  summary: SkillGapSummary;
+  strengths: string[];
+  missingSkillsCount: number;
+  suggestedNextSkills: string[];
+  gapsSummary: string;
 };
 
-export default function SkillGapSummaryCard({ summary }: SkillGapSummaryCardProps): JSX.Element {
+export default function SkillGapSummaryCard({
+  strengths,
+  missingSkillsCount,
+  suggestedNextSkills,
+  gapsSummary,
+}: SkillGapSummaryCardProps): JSX.Element {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="text-base font-semibold text-slate-900">Gap Summary</h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <SummaryBlock
           title="Strengths"
-          value={summary.strengths.length}
-          details={summary.strengths.length > 0 ? summary.strengths.join(", ") : "No skills added yet."}
+          value={strengths.length}
+          details={strengths.length > 0 ? strengths.join(", ") : "No skills added yet."}
         />
         <SummaryBlock
           title="Gaps"
-          value={summary.gaps.length}
-          details={summary.gaps.length > 0 ? summary.gaps.join(", ") : "No major gaps detected."}
+          value={missingSkillsCount}
+          details={gapsSummary}
         />
         <SummaryBlock
           title="Suggested Next"
-          value={summary.suggested_next_skills.length}
+          value={suggestedNextSkills.length}
           details={
-            summary.suggested_next_skills.length > 0
-              ? summary.suggested_next_skills.join(", ")
-              : "Add interests and fetch recommendations first."
+            suggestedNextSkills.length > 0
+              ? suggestedNextSkills.join(", ")
+              : "No immediate next-skill recommendation."
           }
         />
       </div>

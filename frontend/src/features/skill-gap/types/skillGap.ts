@@ -1,26 +1,24 @@
-import type { UserProfileResponse } from "../../profile/types/profile";
-import type { ExplainedRecommendation } from "../../recommendations/types/recommendation";
-
-export type SkillGapDataSource = {
-  profile: UserProfileResponse;
-  recommendations: ExplainedRecommendation[];
+export type SkillGapEvidenceSource = {
+  paper_id: string;
+  title: string | null;
+  final_score: number;
+  matched_fields: string[];
+  top_contributing_signals: string[];
 };
 
-export type DerivedSkill = {
-  name: string;
+export type MissingSkillEvidence = {
+  skill: string;
   confidence: number;
   evidence_count: number;
+  supporting_papers: SkillGapEvidenceSource[];
+  rationale: string;
 };
 
-export type SkillGapSummary = {
-  strengths: string[];
-  gaps: string[];
-  suggested_next_skills: string[];
-};
-
-export type SkillGapViewModel = {
+export type SkillGapResponse = {
   user_id: string;
   current_skills: string[];
-  missing_skills: DerivedSkill[];
-  summary: SkillGapSummary;
+  missing_skills: MissingSkillEvidence[];
+  suggested_next_skills: string[];
+  strengths: string[];
+  gaps_summary: string;
 };
