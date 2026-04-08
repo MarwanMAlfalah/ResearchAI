@@ -25,17 +25,17 @@ export default function ProfileSummary({
   errorMessage,
 }: ProfileSummaryProps): JSX.Element {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="card-panel">
       <h2 className="text-lg font-semibold text-slate-900">Profile Status</h2>
 
       {statusMessage ? (
-        <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        <p className="state-panel state-panel-success mt-3 p-3 text-sm">
           {statusMessage}
         </p>
       ) : null}
 
       {errorMessage ? (
-        <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+        <p className="state-panel state-panel-error mt-3 p-3 text-sm">
           {errorMessage}
         </p>
       ) : null}

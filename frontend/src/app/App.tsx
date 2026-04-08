@@ -32,7 +32,7 @@ export default function App(): JSX.Element {
             <button
               type="button"
               onClick={() => setActivePage("profile")}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              className={`btn-nav ${
                 activePage === "profile" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
@@ -41,7 +41,7 @@ export default function App(): JSX.Element {
             <button
               type="button"
               onClick={() => setActivePage("recommendations")}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              className={`btn-nav ${
                 activePage === "recommendations"
                   ? "bg-slate-900 text-white"
                   : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -52,7 +52,7 @@ export default function App(): JSX.Element {
             <button
               type="button"
               onClick={() => setActivePage("search")}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              className={`btn-nav ${
                 activePage === "search" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
@@ -61,7 +61,7 @@ export default function App(): JSX.Element {
             <button
               type="button"
               onClick={() => setActivePage("skill-gap")}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              className={`btn-nav ${
                 activePage === "skill-gap" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
               }`}
             >
@@ -69,10 +69,10 @@ export default function App(): JSX.Element {
             </button>
           </div>
 
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5">
+          <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 shadow-sm">
             <span className="text-xs font-medium uppercase tracking-wide text-slate-500">Active User</span>
             <input
-              className="w-32 rounded-md border border-slate-300 bg-white px-2 py-1 text-sm text-slate-700 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              className="input-control w-32 px-2 py-1"
               value={activeUserDraft}
               onChange={(event) => setActiveUserDraft(event.target.value)}
               placeholder="user_001"
@@ -80,13 +80,13 @@ export default function App(): JSX.Element {
             <button
               type="button"
               onClick={applyActiveUserId}
-              className="rounded-md bg-slate-900 px-2.5 py-1 text-xs font-medium text-white transition hover:bg-slate-700"
+              className="btn-primary px-2.5 py-1 text-xs"
             >
               Apply
             </button>
           </div>
         </div>
-        <div className="mx-auto max-w-5xl px-4 pb-3 text-xs text-slate-500 sm:px-8">
+        <div className="mx-auto max-w-5xl border-t border-slate-100 px-4 pb-3 pt-2 text-xs text-slate-500 sm:px-8">
           Current context: <span className="font-semibold text-slate-700">{activeUserId}</span>. User-aware pages are
           prefilled automatically.
         </div>

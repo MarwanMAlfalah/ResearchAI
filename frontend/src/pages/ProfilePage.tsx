@@ -133,14 +133,14 @@ export default function ProfilePage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-8">
-      <section className="mx-auto max-w-5xl">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Profile Setup</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">
+    <main className="app-shell">
+      <section className="app-container">
+        <header className="page-header">
+          <h1 className="page-title">Profile Setup</h1>
+          <p className="page-subtitle">
             Manage user profile metadata and skills before generating recommendations.
           </p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="page-caption">
             User ID is synced with the active app context shown in the top navigation.
           </p>
         </header>
@@ -159,7 +159,7 @@ export default function ProfilePage({
           <ProfileSummary profile={savedProfile} statusMessage={statusMessage} errorMessage={errorMessage} />
         </div>
 
-        <section className="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <section className="card-panel mt-6 p-4">
           <h2 className="text-sm font-semibold text-slate-900">Next Action</h2>
           <p className="mt-1 text-sm text-slate-600">
             After saving a profile, continue to recommendations and use the same user ID.
@@ -168,7 +168,7 @@ export default function ProfilePage({
             type="button"
             onClick={onNavigateToRecommendations}
             disabled={!canNavigate}
-            className="mt-3 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-primary mt-3"
           >
             Go to Recommendations
           </button>

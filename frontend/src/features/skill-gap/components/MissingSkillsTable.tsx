@@ -10,7 +10,7 @@ function confidenceLabel(value: number): string {
 
 export default function MissingSkillsTable({ skills }: MissingSkillsTableProps): JSX.Element {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="card-panel">
       <h2 className="text-base font-semibold text-slate-900">Missing / Recommended Skills</h2>
       <p className="mt-1 text-sm text-slate-600">Backend-driven skill gap evidence from profile and recommendations.</p>
 
@@ -52,7 +52,7 @@ export default function MissingSkillsTable({ skills }: MissingSkillsTableProps):
                 <p className="mt-1 text-sm text-slate-700">{skill.rationale}</p>
                 {skill.supporting_papers.length > 0 ? (
                   <div className="mt-2 text-xs text-slate-600">
-                    <p className="font-medium text-slate-700">Evidence Papers</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-700">Evidence Papers</p>
                     <p className="mt-1">
                       {skill.supporting_papers
                         .map((paper) => `${paper.title ?? paper.paper_id} (score ${paper.final_score.toFixed(3)})`)

@@ -16,7 +16,7 @@ export default function RecommendationsPanel({
 }: RecommendationsPanelProps): JSX.Element {
   if (loading) {
     return (
-      <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="state-panel state-panel-loading mt-6">
         <p className="text-sm text-slate-600">Loading recommendations...</p>
       </section>
     );
@@ -24,7 +24,7 @@ export default function RecommendationsPanel({
 
   if (error) {
     return (
-      <section className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-6 shadow-sm">
+      <section className="state-panel state-panel-error mt-6">
         <p className="text-sm font-medium text-rose-700">{error}</p>
       </section>
     );
@@ -32,7 +32,7 @@ export default function RecommendationsPanel({
 
   if (hasFetched && recommendations.length === 0) {
     return (
-      <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="state-panel state-panel-empty mt-6 border-slate-200">
         <p className="text-sm text-slate-600">No recommendations found for this user profile.</p>
       </section>
     );
@@ -40,7 +40,7 @@ export default function RecommendationsPanel({
 
   if (!hasFetched) {
     return (
-      <section className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white p-6">
+      <section className="state-panel state-panel-empty mt-6 border-dashed">
         <p className="text-sm text-slate-600">Enter a user ID and fetch recommendations to begin.</p>
       </section>
     );

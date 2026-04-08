@@ -84,28 +84,25 @@ export default function SearchPage({ activeUserId }: SearchPageProps): JSX.Eleme
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-8">
-      <section className="mx-auto max-w-5xl">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Search and Import</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">
+    <main className="app-shell">
+      <section className="app-container">
+        <header className="page-header">
+          <h1 className="page-title">Search and Import</h1>
+          <p className="page-subtitle">
             Discover papers from OpenAlex and import selected records directly into the ResearchGraph knowledge graph.
           </p>
           {activeUserId ? (
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="page-caption">
               Active user context: <span className="font-semibold text-slate-700">{activeUserId}</span>
             </p>
           ) : null}
         </header>
 
-        <form
-          className="mt-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1fr_140px_auto]"
-          onSubmit={handleSearch}
-        >
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">Search Query</span>
+        <form className="form-card sm:grid-cols-[1fr_140px_auto]" onSubmit={handleSearch}>
+          <label className="field">
+            <span className="field-label">Search Query</span>
             <input
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              className="input-control"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Find papers by topic, method, or keyword"
@@ -113,13 +110,13 @@ export default function SearchPage({ activeUserId }: SearchPageProps): JSX.Eleme
             />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">Limit</span>
+          <label className="field">
+            <span className="field-label">Limit</span>
             <input
               type="number"
               min={1}
               max={50}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              className="input-control"
               value={limit}
               onChange={(event) => setLimit(Number(event.target.value))}
               required
@@ -129,13 +126,15 @@ export default function SearchPage({ activeUserId }: SearchPageProps): JSX.Eleme
           <button
             type="submit"
             disabled={loading}
-            className="h-fit self-end rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-primary h-fit self-end"
           >
             {loading ? "Searching..." : "Search"}
           </button>
         </form>
 
-        <div className="mt-3 text-xs text-slate-500">Results: {hasSearched ? resultCount : 0}</div>
+        <div className="mt-3 text-xs text-slate-500">
+          Results: <span className="font-semibold text-slate-700">{hasSearched ? resultCount : 0}</span>
+        </div>
 
         <SearchResultsPanel
           loading={loading}

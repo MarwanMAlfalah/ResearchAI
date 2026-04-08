@@ -64,24 +64,21 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-8 sm:px-8">
-      <section className="mx-auto max-w-5xl">
-        <header>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Skill Gap Analysis</h1>
-          <p className="mt-2 max-w-2xl text-sm text-slate-600">
+    <main className="app-shell">
+      <section className="app-container">
+        <header className="page-header">
+          <h1 className="page-title">Skill Gap Analysis</h1>
+          <p className="page-subtitle">
             Compare current profile skills against backend-generated gap analysis and supporting recommendation evidence.
           </p>
-          <p className="mt-1 text-xs text-slate-500">User ID is prefilled from the active app context.</p>
+          <p className="page-caption">User ID is prefilled from the active app context.</p>
         </header>
 
-        <form
-          className="mt-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[1fr_180px_auto]"
-          onSubmit={handleLoad}
-        >
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">User ID</span>
+        <form className="form-card sm:grid-cols-[1fr_180px_auto]" onSubmit={handleLoad}>
+          <label className="field">
+            <span className="field-label">User ID</span>
             <input
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              className="input-control"
               value={userId}
               onChange={(event) => handleUserIdInput(event.target.value)}
               placeholder="Enter user ID"
@@ -89,13 +86,13 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
             />
           </label>
 
-          <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-slate-700">Limit</span>
+          <label className="field">
+            <span className="field-label">Limit</span>
             <input
               type="number"
               min={1}
               max={100}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+              className="input-control"
               value={limit}
               onChange={(event) => setLimit(Number(event.target.value))}
               required
@@ -105,26 +102,26 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
           <button
             type="submit"
             disabled={loading}
-            className="h-fit self-end rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-primary h-fit self-end"
           >
             {loading ? "Loading..." : "Load Skill Gap"}
           </button>
         </form>
 
         {error ? (
-          <section className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-6 shadow-sm">
+          <section className="state-panel state-panel-error mt-6">
             <p className="text-sm font-medium text-rose-700">{error}</p>
           </section>
         ) : null}
 
         {loading ? (
-          <section className="mt-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <section className="state-panel state-panel-loading mt-6">
             <p className="text-sm text-slate-600">Loading backend skill gap analysis...</p>
           </section>
         ) : null}
 
         {!loading && !error && !hasLoaded ? (
-          <section className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white p-6">
+          <section className="state-panel state-panel-empty mt-6 border-dashed">
             <p className="text-sm text-slate-600">Load backend skill gap analysis to view strengths and recommended skills.</p>
           </section>
         ) : null}

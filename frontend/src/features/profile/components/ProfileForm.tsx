@@ -22,17 +22,17 @@ export default function ProfileForm({
   onSave,
 }: ProfileFormProps): JSX.Element {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className="card-panel">
       <h2 className="text-lg font-semibold text-slate-900">User Profile</h2>
       <p className="mt-1 text-sm text-slate-600">
         Create or update a user profile that powers downstream recommendation scoring.
       </p>
 
       <div className="mt-5 grid gap-4">
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">User ID</span>
+        <label className="field">
+          <span className="field-label">User ID</span>
           <input
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            className="input-control"
             value={form.user_id}
             onChange={(event) => onChange("user_id", event.target.value)}
             placeholder="e.g. user_001"
@@ -40,10 +40,10 @@ export default function ProfileForm({
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Name</span>
+        <label className="field">
+          <span className="field-label">Name</span>
           <input
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            className="input-control"
             value={form.name}
             onChange={(event) => onChange("name", event.target.value)}
             placeholder="Full name"
@@ -51,20 +51,20 @@ export default function ProfileForm({
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Interests</span>
+        <label className="field">
+          <span className="field-label">Interests</span>
           <textarea
-            className="min-h-[120px] rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            className="textarea-control"
             value={form.interests_text}
             onChange={(event) => onChange("interests_text", event.target.value)}
             placeholder="Research interests, topics, and methods..."
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-slate-700">Skills (comma-separated)</span>
+        <label className="field">
+          <span className="field-label">Skills (comma-separated)</span>
           <input
-            className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+            className="input-control"
             value={skillsInput}
             onChange={(event) => onSkillsInputChange(event.target.value)}
             placeholder="Python, Graph ML, NLP"
@@ -77,7 +77,7 @@ export default function ProfileForm({
           type="button"
           onClick={onLoad}
           disabled={loading || form.user_id.trim().length === 0}
-          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-secondary"
         >
           {loading ? "Loading..." : "Load Profile"}
         </button>
@@ -86,7 +86,7 @@ export default function ProfileForm({
           type="button"
           onClick={onSave}
           disabled={loading || form.user_id.trim().length === 0 || form.name.trim().length === 0}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-primary"
         >
           {loading ? "Saving..." : "Save / Update Profile"}
         </button>

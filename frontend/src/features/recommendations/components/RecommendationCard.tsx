@@ -31,7 +31,7 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
   const evidence = recommendation.evidence;
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md">
+    <article className="card-panel transition hover:shadow-md">
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-semibold text-slate-900">{recommendation.title ?? "Untitled Paper"}</h3>
@@ -51,7 +51,7 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
       </section>
 
       <section className="mt-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Top Signals</p>
+        <p className="section-kicker">Top Signals</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {recommendation.top_contributing_signals.map((signal) => (
             <span
@@ -65,12 +65,12 @@ export default function RecommendationCard({ recommendation }: RecommendationCar
       </section>
 
       <section className="mt-4 rounded-lg bg-slate-50 p-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Explanation</p>
+        <p className="section-kicker">Explanation</p>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">{recommendation.explanation_text}</p>
       </section>
 
       <section className="mt-4 border-t border-slate-100 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Evidence</p>
+        <p className="section-kicker">Evidence</p>
         <dl className="mt-2 grid grid-cols-1 gap-2 text-sm text-slate-700 sm:grid-cols-2">
           <EvidenceItem label="Publication Year" value={evidence.publication_year ?? "N/A"} />
           <EvidenceItem label="Cited By Count" value={evidence.cited_by_count ?? "N/A"} />
