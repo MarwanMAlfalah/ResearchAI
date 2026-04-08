@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter
 
+from app.routers.advisor import router as advisor_router
 from app.routers.health import router as health_router
 from app.routers.imports import router as import_router
 from app.routers.recommend import router as recommend_router
@@ -16,3 +17,4 @@ api_router.include_router(import_router)
 api_router.include_router(user_profile_router)
 api_router.include_router(recommend_router)
 api_router.include_router(skill_gap_router)
+api_router.include_router(advisor_router)

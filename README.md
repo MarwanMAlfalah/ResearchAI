@@ -85,6 +85,187 @@ Other implemented backend capabilities:
 - embedding generation for user interests and paper text
 - centrality fallback to `cited_by_count` when `CITES` graph is sparse
 
+### Concise API Reference
+Base URL (local): `http://localhost:8000`
+
+#### `GET /api/v1/health`
+- Purpose: basic service health check.
+- Params/body: none.
+- Example request:
+```bash
+curl "http://localhost:8000/api/v1/health"
+```
+- Example response shape:
+```json
+{ "status": "ok" }
+```
+
+#### `GET /api/v1/health/neo4j`
+- Purpose: verify Neo4j connectivity from the running API.
+- Params/body: none.
+- Example request:
+```bash
+curl "http://localhost:8000/api/v1/health/neo4j"
+```
+- Example response shape:
+```json
+{ "status": "ok", "neo4j": "connected" }
+```
+
+#### `GET /api/v1/search/papers`
+- Purpose: search OpenAlex and return normalized paper results.
+- Query params: `q` (string, required), `limit` (int, optional, 1-50).
+- Example request:
+```bash
+curl "http://localhost:8000/api/v1/search/papers?q=knowledge+graph&limit=5"
+```
+- Example response shape:
+```json
+[
+  {
+    "title": "Paper title",
+    "abstract": "Abstract text",
+    "authors": [{ "name": "Author Name", "openalex_id": "https://openalex.org/A...", "orcid": null }],
+    "publication_year": 2023,
+    "cited_by_count": 42,
+    "concepts": [{ "name": "Knowledge graph", "openalex_id": "https://openalex.org/C...", "score": 0.78 }],
+    "ids": { "openalex": "https://openalex.org/W..." }
+  }
+]
+```
+
+#### `POST /api/v1/import/paper/{openalex_id}`
+- Purpose: fetch a paper by OpenAlex ID, normalize it, and import to Neo4j.
+- Path param: `openalex_id` (e.g. `W2741809807`).
+- Example request:
+```bash
+curl -X POST "http://localhost:8000/api/v1/import/paper/W2741809807"
+```
+- Example response shape:
+```json
+{
+  "status": "imported",
+  "openalex_id": "W2741809807",
+  "imported": {
+    "paper_id": "https://openalex.org/W2741809807",
+    "authors_merged": 3,
+    "topics_merged": 5,
+    "author_ids": ["https://openalex.org/A..."],
+    "topic_names": ["Machine learning"]
+  }
+}
+```
+
+#### `POST /api/v1/user/profile`
+- Purpose: create or update a user profile and linked skills.
+- Body shape:
+```json
+{
+  "user_id": "user_001",
+  "name": "Alice",
+  "interests_text": "knowledge graphs, recommender systems",
+  "skills": ["Python", "Neo4j"]
+}
+```
+- Example request:
+```bash
+curl -X POST "http://localhost:8000/api/v1/user/profile" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"user_001","name":"Alice","interests_text":"knowledge graphs","skills":["Python","Neo4j"]}'
+```
+- Example response shape:
+```json
+{
+  "user_id": "user_001",
+  "name": "Alice",
+  "interests_text": "knowledge graphs",
+  "interests_embedding": [0.01, -0.12],
+  "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "skills": ["Python", "Neo4j"],
+  "created_at": "2026-04-08T18:00:00",
+  "updated_at": "2026-04-08T18:01:00"
+}
+```
+
+#### `GET /api/v1/user/profile/{id}`
+- Purpose: fetch a user profile with linked skills.
+- Path param: `id` (user ID).
+- Example request:
+```bash
+curl "http://localhost:8000/api/v1/user/profile/user_001"
+```
+- Example response shape: same as `POST /api/v1/user/profile` response model.
+
+#### `GET /api/v1/recommend/papers/explained`
+- Purpose: return scored recommendations with explanation and evidence fields.
+- Query params: `user_id` (required), `limit` (optional, 1-100).
+- Example request:
+```bash
+curl "http://localhost:8000/api/v1/recommend/papers/explained?user_id=user_001&limit=5"
+```
+- Example response shape:
+```json
+{
+  "user_id": "user_001",
+  "recommendations": [
+    {
+      "paper_id": "https://openalex.org/W...",
+      "title": "Paper title",
+      "semantic_similarity": 0.81,
+      "graph_centrality": 0.42,
+      "recency": 0.77,
+      "final_score": 0.72,
+      "top_contributing_signals": ["semantic_similarity", "recency", "graph_centrality"],
+      "explanation_text": "Strong semantic match to your interests; ...",
+      "evidence": {
+        "publication_year": 2022,
+        "cited_by_count": 31,
+        "centrality_source": "cited_by_count_fallback",
+        "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+        "semantic_strength_bucket": "high",
+        "centrality_strength_bucket": "medium",
+        "recency_strength_bucket": "high"
+      }
+    }
+  ]
+}
+```
+
+#### `GET /api/v1/skill-gap`
+- Purpose: return backend-driven skill-gap analysis from profile + recommendation evidence.
+- Query params: `user_id` (required), `limit` (optional, 1-100).
+- Example request:
+```bash
+curl "http://localhost:8000/api/v1/skill-gap?user_id=user_001&limit=10"
+```
+- Example response shape:
+```json
+{
+  "user_id": "user_001",
+  "current_skills": ["Python", "Neo4j"],
+  "missing_skills": [
+    {
+      "skill": "Knowledge Graphs",
+      "confidence": 0.92,
+      "evidence_count": 3,
+      "supporting_papers": [
+        {
+          "paper_id": "https://openalex.org/W...",
+          "title": "Paper title",
+          "final_score": 0.74,
+          "matched_fields": ["title", "explanation"],
+          "top_contributing_signals": ["semantic_similarity", "recency", "graph_centrality"]
+        }
+      ],
+      "rationale": "Matched user interests and appeared in recommendation evidence."
+    }
+  ],
+  "suggested_next_skills": ["Knowledge Graphs", "Link Prediction"],
+  "strengths": ["Python", "Neo4j"],
+  "gaps_summary": "Identified potential skill gaps from recommendation evidence."
+}
+```
+
 ## 8. Frontend Capabilities
 Implemented pages and behavior:
 - **Profile**: load/save user profile, skills, interests

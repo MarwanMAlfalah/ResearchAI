@@ -1,5 +1,6 @@
 """Domain and request/response models."""
 
+from app.models.advisor import AdvisorChatRequest, AdvisorChatResponse, AdvisorSupportingItem
 from app.models.ingestion import (
     NormalizedAuthor,
     NormalizedConcept,
@@ -23,6 +24,9 @@ from app.models.skill_gap import MissingSkillEvidence, SkillGapEvidenceSource, S
 from app.models.user_profile import UserProfileResponse, UserProfileUpsertRequest
 
 __all__ = [
+    "AdvisorChatRequest",
+    "AdvisorSupportingItem",
+    "AdvisorChatResponse",
     "NormalizedAuthor",
     "NormalizedConcept",
     "NormalizedPaper",
