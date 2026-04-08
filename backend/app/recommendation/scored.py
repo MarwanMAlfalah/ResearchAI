@@ -71,7 +71,7 @@ def recommend_papers_with_scores(
             continue
 
         semantic_similarity = cosine_similarity(user_embedding, paper_embedding)
-        graph_centrality = _graph_centrality_score(candidate, centrality_context)
+        graph_centrality, centrality_source = _graph_centrality_score(candidate, centrality_context)
         recency = _recency_score(candidate.get("publication_year"), context)
 
         final_score = (
@@ -88,6 +88,10 @@ def recommend_papers_with_scores(
                 graph_centrality=float(graph_centrality),
                 recency=float(recency),
                 final_score=float(final_score),
+                publication_year=_to_int_or_none(candidate.get("publication_year")),
+                cited_by_count=_to_int_or_none(candidate.get("cited_by_count")),
+                embedding_model=_to_str_or_none(candidate.get("embedding_model")),
+                centrality_source=centrality_source,
             )
         )
 
@@ -110,18 +114,18 @@ def _recency_score(publication_year: Any, context: ScoringContext) -> float:
 def _graph_centrality_score(
     candidate: dict[str, Any],
     context: CentralityNormalizationContext,
-) -> float:
+) -> tuple[float, str]:
     """Compute centrality using CITES degree, with cited_by_count fallback."""
 
     degree = _to_float(candidate.get("citation_degree"))
     if context.max_citation_degree > 0.0:
-        return _normalize_signal(degree, context.max_citation_degree)
+        return _normalize_signal(degree, context.max_citation_degree), "CITES"
 
     cited_by_count = _to_float(candidate.get("cited_by_count"))
     if context.max_cited_by_count > 0.0:
-        return _normalize_signal(cited_by_count, context.max_cited_by_count)
+        return _normalize_signal(cited_by_count, context.max_cited_by_count), "cited_by_count_fallback"
 
-    return 0.0
+    return 0.0, "cited_by_count_fallback"
 
 
 def _max_citation_degree(candidates: list[dict[str, Any]]) -> float:
@@ -161,6 +165,26 @@ def _to_float(value: Any) -> float:
         return float(value or 0.0)
     except (TypeError, ValueError):
         return 0.0
+
+
+def _to_int_or_none(value: Any) -> int | None:
+    """Convert arbitrary value to int if possible."""
+
+    try:
+        if value is None:
+            return None
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _to_str_or_none(value: Any) -> str | None:
+    """Convert arbitrary value to string if non-empty."""
+
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def _to_float_list_or_none(value: Any) -> list[float] | None:

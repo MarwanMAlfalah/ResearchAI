@@ -89,6 +89,7 @@ def get_paper_embedding_candidates(neo4j_client: Neo4jClient) -> list[dict[str, 
             p.paper_id AS paper_id,
             p.title AS title,
             p.paper_embedding AS paper_embedding,
+            p.embedding_model AS embedding_model,
             p.publication_year AS publication_year,
             p.cited_by_count AS cited_by_count,
             toFloat(incoming_citations + outgoing_citations) AS citation_degree

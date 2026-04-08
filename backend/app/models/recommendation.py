@@ -29,6 +29,10 @@ class ScoredPaperRecommendation(BaseModel):
     graph_centrality: float
     recency: float
     final_score: float
+    publication_year: int | None = None
+    cited_by_count: int | None = None
+    embedding_model: str | None = None
+    centrality_source: str | None = None
 
 
 class ScoredPaperRecommendationResponse(BaseModel):
@@ -52,6 +56,19 @@ class ExplainedPaperRecommendation(BaseModel):
     final_score: float
     top_contributing_signals: list[str] = Field(default_factory=list)
     explanation_text: str
+    evidence: "RecommendationEvidence"
+
+
+class RecommendationEvidence(BaseModel):
+    """Structured evidence payload for transparent recommendation cards."""
+
+    publication_year: int | None = None
+    cited_by_count: int | None = None
+    centrality_source: str
+    embedding_model: str | None = None
+    semantic_strength_bucket: str
+    centrality_strength_bucket: str
+    recency_strength_bucket: str
 
 
 class ExplainedPaperRecommendationResponse(BaseModel):

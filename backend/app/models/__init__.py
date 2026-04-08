@@ -13,6 +13,7 @@ from app.models.ingestion import (
 from app.models.recommendation import (
     ExplainedPaperRecommendation,
     ExplainedPaperRecommendationResponse,
+    RecommendationEvidence,
     ScoredPaperRecommendation,
     ScoredPaperRecommendationResponse,
     SemanticPaperRecommendation,
@@ -37,4 +38,5 @@ __all__ = [
     "ScoredPaperRecommendationResponse",
     "ExplainedPaperRecommendation",
     "ExplainedPaperRecommendationResponse",
+    "RecommendationEvidence",
 ]

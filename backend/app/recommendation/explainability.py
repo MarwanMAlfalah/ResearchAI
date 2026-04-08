@@ -5,7 +5,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from app.core.config import Settings
-from app.models.recommendation import ExplainedPaperRecommendation, ScoredPaperRecommendation
+from app.models.recommendation import (
+    ExplainedPaperRecommendation,
+    RecommendationEvidence,
+    ScoredPaperRecommendation,
+)
 
 
 @dataclass(frozen=True)
@@ -29,6 +33,15 @@ def explain_scored_recommendations(
         contributions = _rank_signal_contributions(rec=rec, settings=settings)
         top_signals = [item.signal for item in contributions]
         explanation_text = _build_explanation_text(rec=rec, contributions=contributions)
+        evidence = RecommendationEvidence(
+            publication_year=rec.publication_year,
+            cited_by_count=rec.cited_by_count,
+            centrality_source=rec.centrality_source or "cited_by_count_fallback",
+            embedding_model=rec.embedding_model,
+            semantic_strength_bucket=_strength_bucket(rec.semantic_similarity),
+            centrality_strength_bucket=_strength_bucket(rec.graph_centrality),
+            recency_strength_bucket=_strength_bucket(rec.recency),
+        )
 
         explained.append(
             ExplainedPaperRecommendation(
@@ -40,6 +53,7 @@ def explain_scored_recommendations(
                 final_score=rec.final_score,
                 top_contributing_signals=top_signals,
                 explanation_text=explanation_text,
+                evidence=evidence,
             )
         )
 
