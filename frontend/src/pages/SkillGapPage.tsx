@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { fetchSkillGapAnalysis } from "../features/skill-gap/api/skillGapApi";
 import MissingSkillsTable from "../features/skill-gap/components/MissingSkillsTable";
@@ -23,6 +23,13 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
   const [analysis, setAnalysis] = useState<SkillGapResponse | null>(null);
 
   const missingSkillNames = useMemo(() => (analysis ? analysis.missing_skills.map((skill) => skill.skill) : []), [analysis]);
+
+  useEffect(() => {
+    if (!initialUserId) {
+      return;
+    }
+    setUserId((prev) => (prev === initialUserId ? prev : initialUserId));
+  }, [initialUserId]);
 
   function handleUserIdInput(value: string): void {
     setUserId(value);
@@ -64,6 +71,7 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Compare current profile skills against backend-generated gap analysis and supporting recommendation evidence.
           </p>
+          <p className="mt-1 text-xs text-slate-500">User ID is prefilled from the active app context.</p>
         </header>
 
         <form

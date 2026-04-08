@@ -12,7 +12,11 @@ type ImportStatus = {
   message?: string;
 };
 
-export default function SearchPage(): JSX.Element {
+type SearchPageProps = {
+  activeUserId?: string;
+};
+
+export default function SearchPage({ activeUserId }: SearchPageProps): JSX.Element {
   const [query, setQuery] = useState<string>(DEFAULT_QUERY);
   const [limit, setLimit] = useState<number>(DEFAULT_LIMIT);
   const [results, setResults] = useState<SearchPaperResult[]>([]);
@@ -87,6 +91,11 @@ export default function SearchPage(): JSX.Element {
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Discover papers from OpenAlex and import selected records directly into the ResearchGraph knowledge graph.
           </p>
+          {activeUserId ? (
+            <p className="mt-1 text-xs text-slate-500">
+              Active user context: <span className="font-semibold text-slate-700">{activeUserId}</span>
+            </p>
+          ) : null}
         </header>
 
         <form

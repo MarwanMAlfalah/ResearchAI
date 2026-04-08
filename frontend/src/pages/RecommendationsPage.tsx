@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 import { fetchExplainedRecommendations } from "../features/recommendations/api/recommendationsApi";
 import RecommendationsPanel from "../features/recommendations/components/RecommendationsPanel";
@@ -22,6 +22,13 @@ export default function RecommendationsPage({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!initialUserId) {
+      return;
+    }
+    setUserId((prev) => (prev === initialUserId ? prev : initialUserId));
+  }, [initialUserId]);
 
   function handleUserIdChange(nextUserId: string): void {
     setUserId(nextUserId);
@@ -60,6 +67,7 @@ export default function RecommendationsPage({
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Retrieve semantically ranked papers with score breakdown and transparent evidence for each recommendation.
           </p>
+          <p className="mt-1 text-xs text-slate-500">User ID is prefilled from the active app context.</p>
         </header>
 
         <form

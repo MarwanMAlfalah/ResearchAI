@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getUserProfile, saveUserProfile } from "../features/profile/api/profileApi";
 import ProfileForm from "../features/profile/components/ProfileForm";
@@ -56,11 +56,21 @@ export default function ProfilePage({
     [savedProfile?.user_id, onNavigateToRecommendations]
   );
 
+  useEffect(() => {
+    if (!initialUserId) {
+      return;
+    }
+    setForm((prev) => (prev.user_id === initialUserId ? prev : { ...prev, user_id: initialUserId }));
+  }, [initialUserId]);
+
   function handleChange(field: EditableProfileField, value: string): void {
     setForm((prev) => ({
       ...prev,
       [field]: value,
     }));
+    if (field === "user_id") {
+      onUserIdReady?.(value.trim());
+    }
   }
 
   function setFormFromProfile(profile: UserProfileResponse): void {
@@ -129,6 +139,9 @@ export default function ProfilePage({
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Profile Setup</h1>
           <p className="mt-2 max-w-2xl text-sm text-slate-600">
             Manage user profile metadata and skills before generating recommendations.
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            User ID is synced with the active app context shown in the top navigation.
           </p>
         </header>
 
