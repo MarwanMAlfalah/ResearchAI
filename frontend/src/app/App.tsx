@@ -3,8 +3,9 @@ import { useState } from "react";
 import ProfilePage from "../pages/ProfilePage";
 import RecommendationsPage from "../pages/RecommendationsPage";
 import SearchPage from "../pages/SearchPage";
+import SkillGapPage from "../pages/SkillGapPage";
 
-type AppPage = "profile" | "recommendations" | "search";
+type AppPage = "profile" | "recommendations" | "search" | "skill-gap";
 
 export default function App(): JSX.Element {
   const [activePage, setActivePage] = useState<AppPage>("profile");
@@ -43,6 +44,15 @@ export default function App(): JSX.Element {
           >
             Search
           </button>
+          <button
+            type="button"
+            onClick={() => setActivePage("skill-gap")}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              activePage === "skill-gap" ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+            }`}
+          >
+            Skill Gap
+          </button>
         </div>
       </nav>
 
@@ -54,8 +64,10 @@ export default function App(): JSX.Element {
         />
       ) : activePage === "recommendations" ? (
         <RecommendationsPage initialUserId={activeUserId} onUserIdChange={setActiveUserId} />
-      ) : (
+      ) : activePage === "search" ? (
         <SearchPage />
+      ) : (
+        <SkillGapPage initialUserId={activeUserId} onUserIdChange={setActiveUserId} />
       )}
     </div>
   );
