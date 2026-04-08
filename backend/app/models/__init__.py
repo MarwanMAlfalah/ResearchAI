@@ -19,6 +19,7 @@ from app.models.recommendation import (
     SemanticPaperRecommendation,
     SemanticPaperRecommendationResponse,
 )
+from app.models.skill_gap import MissingSkillEvidence, SkillGapEvidenceSource, SkillGapResponse
 from app.models.user_profile import UserProfileResponse, UserProfileUpsertRequest
 
 __all__ = [
@@ -39,4 +40,7 @@ __all__ = [
     "ExplainedPaperRecommendation",
     "ExplainedPaperRecommendationResponse",
     "RecommendationEvidence",
+    "SkillGapEvidenceSource",
+    "MissingSkillEvidence",
+    "SkillGapResponse",
 ]
