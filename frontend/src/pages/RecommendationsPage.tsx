@@ -7,13 +7,26 @@ import type { ExplainedRecommendation } from "../features/recommendations/types/
 const DEFAULT_USER_ID = "user_001";
 const DEFAULT_LIMIT = 5;
 
-export default function RecommendationsPage(): JSX.Element {
-  const [userId, setUserId] = useState<string>(DEFAULT_USER_ID);
+type RecommendationsPageProps = {
+  initialUserId?: string;
+  onUserIdChange?: (userId: string) => void;
+};
+
+export default function RecommendationsPage({
+  initialUserId,
+  onUserIdChange,
+}: RecommendationsPageProps): JSX.Element {
+  const [userId, setUserId] = useState<string>(initialUserId ?? DEFAULT_USER_ID);
   const [limit, setLimit] = useState<number>(DEFAULT_LIMIT);
   const [recommendations, setRecommendations] = useState<ExplainedRecommendation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasFetched, setHasFetched] = useState<boolean>(false);
+
+  function handleUserIdChange(nextUserId: string): void {
+    setUserId(nextUserId);
+    onUserIdChange?.(nextUserId);
+  }
 
   const recommendationCount = useMemo(() => recommendations.length, [recommendations.length]);
 
@@ -58,7 +71,7 @@ export default function RecommendationsPage(): JSX.Element {
             <input
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
               value={userId}
-              onChange={(event) => setUserId(event.target.value)}
+              onChange={(event) => handleUserIdChange(event.target.value)}
               placeholder="Enter user ID"
               required
             />
