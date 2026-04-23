@@ -1,3 +1,4 @@
+import { EmptyState, MetadataGrid, Pill, SectionCard, StatusPanel } from "../../../components/ui";
 import type { UserProfileResponse } from "../types/profile";
 
 type ProfileSummaryProps = {
@@ -25,49 +26,57 @@ export default function ProfileSummary({
   errorMessage,
 }: ProfileSummaryProps): JSX.Element {
   return (
-    <section className="card-panel">
-      <h2 className="text-lg font-semibold text-slate-900">Profile Status</h2>
-
+    <SectionCard
+      eyebrow="Snapshot"
+      title="Profile status"
+      description="Persisted profile details stay visible here so you can validate the context before moving into recommendations."
+      contentClassName="grid gap-4"
+    >
       {statusMessage ? (
-        <p className="state-panel state-panel-success mt-3 p-3 text-sm">
+        <StatusPanel tone="success" title="Saved state">
           {statusMessage}
-        </p>
+        </StatusPanel>
       ) : null}
 
       {errorMessage ? (
-        <p className="state-panel state-panel-error mt-3 p-3 text-sm">
+        <StatusPanel tone="error" title="Action needed">
           {errorMessage}
-        </p>
+        </StatusPanel>
       ) : null}
 
       {!profile ? (
-        <p className="mt-4 rounded-lg border border-dashed border-slate-300 px-3 py-4 text-sm text-slate-600">
-          Load or save a profile to view persisted details.
-        </p>
+        <EmptyState
+          title="No persisted profile yet"
+          description="Load an existing researcher or save this form to see the stored profile, metadata, and sync status."
+        />
       ) : (
-        <dl className="mt-4 grid gap-2 text-sm text-slate-700">
-          <SummaryItem label="User ID" value={profile.user_id} />
-          <SummaryItem label="Name" value={profile.name} />
-          <SummaryItem label="Skills" value={profile.skills.length > 0 ? profile.skills.join(", ") : "None"} />
-          <SummaryItem label="Embedding Model" value={profile.embedding_model ?? "N/A"} />
-          <SummaryItem label="Created" value={formatDate(profile.created_at)} />
-          <SummaryItem label="Updated" value={formatDate(profile.updated_at)} />
-        </dl>
+        <div className="grid gap-4">
+          <MetadataGrid
+            items={[
+              { label: "User ID", value: profile.user_id },
+              { label: "Name", value: profile.name },
+              { label: "Embedding Model", value: profile.embedding_model ?? "N/A" },
+              { label: "Created", value: formatDate(profile.created_at) },
+              { label: "Updated", value: formatDate(profile.updated_at) },
+            ]}
+          />
+
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Skills</p>
+            {profile.skills.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {profile.skills.map((skill) => (
+                  <Pill key={skill} tone="accent" className="normal-case tracking-normal">
+                    {skill}
+                  </Pill>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-slate-600">No skills have been attached to this profile yet.</p>
+            )}
+          </div>
+        </div>
       )}
-    </section>
-  );
-}
-
-type SummaryItemProps = {
-  label: string;
-  value: string;
-};
-
-function SummaryItem({ label, value }: SummaryItemProps): JSX.Element {
-  return (
-    <div className="rounded-md bg-slate-50 px-3 py-2">
-      <dt className="text-[11px] uppercase tracking-wide text-slate-500">{label}</dt>
-      <dd className="mt-0.5 text-sm font-medium text-slate-800">{value}</dd>
-    </div>
+    </SectionCard>
   );
 }

@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
+import { ActionBar, Button, FormField, PageHeader, Pill, StatCard, StatusPanel } from "../components/ui";
 import { fetchSkillGapAnalysis } from "../features/skill-gap/api/skillGapApi";
 import MissingSkillsTable from "../features/skill-gap/components/MissingSkillsTable";
 import SkillGapSummaryCard from "../features/skill-gap/components/SkillGapSummaryCard";
@@ -66,68 +67,77 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
   return (
     <main className="app-shell">
       <section className="app-container">
-        <header className="page-header">
-          <h1 className="page-title">Skill Gap Analysis</h1>
-          <p className="page-subtitle">
-            Compare current profile skills against backend-generated gap analysis and supporting recommendation evidence.
-          </p>
-          <p className="page-caption">User ID is prefilled from the active app context.</p>
-        </header>
+        <PageHeader
+          eyebrow="Learning Strategy"
+          title="Skill gap analysis"
+          description="Compare current profile skills with backend-generated gap analysis, then turn the findings into a focused learning roadmap backed by recommendation evidence."
+          meta={
+            <>
+              <span>User ID is prefilled from the active workspace context.</span>
+              <Pill tone={hasLoaded && analysis ? "success" : "muted"}>{hasLoaded && analysis ? "Analysis loaded" : "Awaiting analysis"}</Pill>
+            </>
+          }
+          stats={
+            <>
+              <StatCard label="User Context" value={userId || "Unassigned"} hint="Current researcher being analyzed." />
+              <StatCard label="Missing Skills" value={analysis?.missing_skills.length ?? 0} hint="Evidence-backed missing capabilities." tone="warning" />
+              <StatCard label="Suggested Next" value={analysis?.suggested_next_skills.length ?? 0} hint="Skills to prioritize next." tone="accent" />
+            </>
+          }
+        />
 
-        <form className="form-card sm:grid-cols-[1fr_180px_auto]" onSubmit={handleLoad}>
-          <label className="field">
-            <span className="field-label">User ID</span>
-            <input
-              className="input-control"
-              value={userId}
-              onChange={(event) => handleUserIdInput(event.target.value)}
-              placeholder="Enter user ID"
-              required
-            />
-          </label>
+        <form onSubmit={handleLoad}>
+          <ActionBar>
+            <div className="grid flex-1 gap-4 sm:grid-cols-[minmax(0,1fr)_190px]">
+              <FormField label="User ID" hint="Loads gap analysis for the active researcher profile.">
+                <input
+                  className="input-control"
+                  value={userId}
+                  onChange={(event) => handleUserIdInput(event.target.value)}
+                  placeholder="Enter user ID"
+                  required
+                />
+              </FormField>
 
-          <label className="field">
-            <span className="field-label">Limit</span>
-            <input
-              type="number"
-              min={1}
-              max={100}
-              className="input-control"
-              value={limit}
-              onChange={(event) => setLimit(Number(event.target.value))}
-              required
-            />
-          </label>
+              <FormField label="Limit" hint="Recommendation evidence depth used by the backend.">
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  className="input-control"
+                  value={limit}
+                  onChange={(event) => setLimit(Number(event.target.value))}
+                  required
+                />
+              </FormField>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary h-fit self-end"
-          >
-            {loading ? "Loading..." : "Load Skill Gap"}
-          </button>
+            <Button type="submit" disabled={loading} className="sm:min-w-[200px]">
+              {loading ? "Loading analysis..." : "Load skill gap"}
+            </Button>
+          </ActionBar>
         </form>
 
         {error ? (
-          <section className="state-panel state-panel-error mt-6">
-            <p className="text-sm font-medium text-rose-700">{error}</p>
-          </section>
+          <StatusPanel tone="error" title="Skill gap request failed">
+            {error}
+          </StatusPanel>
         ) : null}
 
         {loading ? (
-          <section className="state-panel state-panel-loading mt-6">
-            <p className="text-sm text-slate-600">Loading backend skill gap analysis...</p>
-          </section>
+          <StatusPanel tone="loading" title="Building analysis">
+            Loading backend skill-gap analysis and supporting recommendation evidence.
+          </StatusPanel>
         ) : null}
 
         {!loading && !error && !hasLoaded ? (
-          <section className="state-panel state-panel-empty mt-6 border-dashed">
-            <p className="text-sm text-slate-600">Load backend skill gap analysis to view strengths and recommended skills.</p>
-          </section>
+          <StatusPanel tone="empty" title="No analysis loaded">
+            Load skill-gap analysis to view strengths, missing skills, and suggested next capabilities.
+          </StatusPanel>
         ) : null}
 
         {!loading && !error && hasLoaded && analysis ? (
-          <div className="mt-6 grid gap-4">
+          <div className="grid gap-6">
             <SkillGapSummaryCard
               strengths={analysis.strengths}
               missingSkillsCount={analysis.missing_skills.length}
@@ -135,26 +145,27 @@ export default function SkillGapPage({ initialUserId, onUserIdChange }: SkillGap
               gapsSummary={analysis.gaps_summary}
             />
 
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-6 xl:grid-cols-2">
               <SkillListSection
-                title="Current Skills"
-                description="Skills currently connected to the user profile."
+                title="Current skills"
+                description="Skills currently attached to the researcher profile."
                 items={analysis.current_skills}
-                emptyText="No skills found in profile. Add skills in the Profile page."
+                emptyText="No skills found in the profile yet. Add them on the Profile page."
               />
               <SkillListSection
-                title="Suggested Skills"
-                description="Backend-suggested next skills based on recommendation evidence."
+                title="Suggested next skills"
+                description="High-priority skills surfaced by the backend from recommendation evidence."
                 items={analysis.suggested_next_skills}
-                emptyText="No suggested skills detected from current backend analysis."
+                emptyText="No suggested next skills detected from the current backend analysis."
                 tone="highlight"
               />
             </div>
 
             <MissingSkillsTable skills={analysis.missing_skills} />
+
             <SkillListSection
-              title="All Missing Skills"
-              description="All backend-identified missing skills for this user."
+              title="All missing skills"
+              description="A compact list of all backend-identified missing skills for this researcher."
               items={missingSkillNames}
               emptyText="No missing skills identified."
               tone="highlight"

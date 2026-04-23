@@ -1,3 +1,4 @@
+import { MetadataGrid, Pill } from "../../../components/ui";
 import type { AdvisorSupportingItem } from "../types/advisor";
 
 type AdvisorSupportingItemsProps = {
@@ -29,25 +30,24 @@ export default function AdvisorSupportingItems({ items }: AdvisorSupportingItems
   }
 
   return (
-    <div className="mt-3 grid gap-2">
+    <div className="mt-4 grid gap-3">
       {items.map((item, index) => (
-        <article key={`${item.item_type}-${item.title}-${index}`} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-slate-900">{item.title}</p>
-            <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-600">
+        <article key={`${item.item_type}-${item.title}-${index}`} className="rounded-[22px] border border-slate-200 bg-slate-50/80 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-semibold text-slate-950">{item.title}</p>
+            <Pill tone="accent" className="normal-case tracking-[0.04em]">
               {item.item_type}
-            </span>
+            </Pill>
           </div>
 
           {Object.keys(item.details).length > 0 ? (
-            <dl className="mt-2 grid gap-1 text-xs text-slate-700">
-              {Object.entries(item.details).map(([key, value]) => (
-                <div key={`${item.title}-${key}`} className="grid grid-cols-[130px_1fr] gap-2">
-                  <dt className="font-medium text-slate-500">{formatFieldName(key)}</dt>
-                  <dd className="text-slate-700">{formatFieldValue(value)}</dd>
-                </div>
-              ))}
-            </dl>
+            <MetadataGrid
+              className="mt-4"
+              items={Object.entries(item.details).map(([key, value]) => ({
+                label: formatFieldName(key),
+                value: formatFieldValue(value),
+              }))}
+            />
           ) : null}
         </article>
       ))}

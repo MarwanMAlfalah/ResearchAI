@@ -1,3 +1,5 @@
+import { EmptyState, Pill, SectionCard } from "../../../components/ui";
+
 type SkillListSectionProps = {
   title: string;
   description: string;
@@ -13,29 +15,21 @@ export default function SkillListSection({
   emptyText,
   tone = "neutral",
 }: SkillListSectionProps): JSX.Element {
-  const badgeClass =
-    tone === "highlight"
-      ? "border-amber-200 bg-amber-50 text-amber-800"
-      : "border-slate-200 bg-slate-50 text-slate-800";
+  const pillTone = tone === "highlight" ? "warning" : "accent";
 
   return (
-    <section className="card-panel">
-      <h2 className="text-base font-semibold text-slate-900">{title}</h2>
-      <p className="mt-1 text-sm text-slate-600">{description}</p>
-
+    <SectionCard title={title} description={description} eyebrow="Skills">
       {items.length === 0 ? (
-        <p className="mt-4 rounded-lg border border-dashed border-slate-300 px-3 py-4 text-sm text-slate-600">
-          {emptyText}
-        </p>
+        <EmptyState title="Nothing to show yet" description={emptyText} />
       ) : (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {items.map((item) => (
-            <span key={`${title}-${item}`} className={`rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClass}`}>
+            <Pill key={`${title}-${item}`} tone={pillTone} className="normal-case tracking-[0.04em]">
               {item}
-            </span>
+            </Pill>
           ))}
         </div>
       )}
-    </section>
+    </SectionCard>
   );
 }

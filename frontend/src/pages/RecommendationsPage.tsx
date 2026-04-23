@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
+import { ActionBar, Button, FormField, PageHeader, Pill, StatCard } from "../components/ui";
 import { fetchExplainedRecommendations } from "../features/recommendations/api/recommendationsApi";
 import RecommendationsPanel from "../features/recommendations/components/RecommendationsPanel";
 import type { ExplainedRecommendation } from "../features/recommendations/types/recommendation";
@@ -36,6 +37,10 @@ export default function RecommendationsPage({
   }
 
   const recommendationCount = useMemo(() => recommendations.length, [recommendations.length]);
+  const topScore = useMemo(
+    () => (recommendations.length > 0 ? recommendations[0].final_score.toFixed(3) : "N/A"),
+    [recommendations]
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -60,51 +65,56 @@ export default function RecommendationsPage({
   return (
     <main className="app-shell">
       <section className="app-container">
-        <header className="page-header">
-          <h1 className="page-title">Explained Recommendations</h1>
-          <p className="page-subtitle">
-            Retrieve semantically ranked papers with score breakdown and transparent evidence for each recommendation.
-          </p>
-          <p className="page-caption">User ID is prefilled from the active app context.</p>
-        </header>
+        <PageHeader
+          eyebrow="Ranking Workspace"
+          title="Explained recommendations"
+          description="Review semantically ranked papers in a product-style queue with clear score breakdowns, evidence signals, and easy-to-scan explanation blocks."
+          meta={
+            <>
+              <span>Prefilled from active workspace context.</span>
+              <Pill tone={hasFetched ? "success" : "muted"}>{hasFetched ? "Results ready" : "Awaiting fetch"}</Pill>
+            </>
+          }
+          stats={
+            <>
+              <StatCard label="User Context" value={userId || "Unassigned"} hint="Used for the recommendation request." />
+              <StatCard label="Results" value={hasFetched ? recommendationCount : 0} hint="Recommendation cards returned." tone="accent" />
+              <StatCard label="Top Score" value={topScore} hint="Highest final score in the current result set." tone="success" />
+            </>
+          }
+        />
 
-        <form className="form-card sm:grid-cols-[1fr_160px_auto]" onSubmit={handleSubmit}>
-          <label className="field">
-            <span className="field-label">User ID</span>
-            <input
-              className="input-control"
-              value={userId}
-              onChange={(event) => handleUserIdChange(event.target.value)}
-              placeholder="Enter user ID"
-              required
-            />
-          </label>
+        <form onSubmit={handleSubmit}>
+          <ActionBar>
+            <div className="grid flex-1 gap-4 sm:grid-cols-[minmax(0,1fr)_180px]">
+              <FormField label="User ID" hint="Matches the active researcher context from the top shell.">
+                <input
+                  className="input-control"
+                  value={userId}
+                  onChange={(event) => handleUserIdChange(event.target.value)}
+                  placeholder="Enter user ID"
+                  required
+                />
+              </FormField>
 
-          <label className="field">
-            <span className="field-label">Limit</span>
-            <input
-              type="number"
-              min={1}
-              max={100}
-              className="input-control"
-              value={limit}
-              onChange={(event) => setLimit(Number(event.target.value))}
-              required
-            />
-          </label>
+              <FormField label="Limit" hint="Choose how many ranked papers to review in this pass.">
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  className="input-control"
+                  value={limit}
+                  onChange={(event) => setLimit(Number(event.target.value))}
+                  required
+                />
+              </FormField>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary h-fit self-end"
-          >
-            {loading ? "Fetching..." : "Fetch Recommendations"}
-          </button>
+            <Button type="submit" disabled={loading} className="sm:min-w-[220px]">
+              {loading ? "Fetching recommendations..." : "Fetch recommendations"}
+            </Button>
+          </ActionBar>
         </form>
-
-        <div className="mt-3 text-xs text-slate-500">
-          Results: <span className="font-semibold text-slate-700">{hasFetched ? recommendationCount : 0}</span>
-        </div>
 
         <RecommendationsPanel
           recommendations={recommendations}

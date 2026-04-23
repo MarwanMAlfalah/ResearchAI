@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 
+import { ActionBar, Button, FormField, PageHeader, Pill, SectionCard, StatCard, StatusPanel } from "../components/ui";
 import { sendAdvisorChat } from "../features/advisor/api/advisorApi";
 import AdvisorMessageList from "../features/advisor/components/AdvisorMessageList";
 import type { AdvisorMessage } from "../features/advisor/types/advisor";
@@ -116,17 +117,27 @@ export default function AdvisorPage({ initialUserId, onUserIdChange }: AdvisorPa
   return (
     <main className="app-shell">
       <section className="app-container">
-        <header className="page-header">
-          <h1 className="page-title">Advisor</h1>
-          <p className="page-subtitle">
-            Ask focused questions about your profile, recommendations, and skill direction using deterministic backend analysis.
-          </p>
-          <p className="page-caption">Uses `/api/v1/advisor/chat` with your active research context.</p>
-        </header>
+        <PageHeader
+          eyebrow="Guidance"
+          title="Advisor"
+          description="Ask focused product questions about the active researcher profile, recommendations, and skill direction in a clean assistant workspace that stays grounded in backend analysis."
+          meta={
+            <>
+              <span>Uses `/api/v1/advisor/chat` with your active research context.</span>
+              <Pill tone={messages.length > 0 ? "success" : "muted"}>{messages.length > 0 ? "Conversation active" : "No messages yet"}</Pill>
+            </>
+          }
+          stats={
+            <>
+              <StatCard label="User Context" value={userId || "Unassigned"} hint="Current advisor context." />
+              <StatCard label="Messages" value={messages.length} hint="Total messages in the current thread." tone="accent" />
+              <StatCard label="Status" value={loading ? "Responding" : "Ready"} hint="The assistant stays deterministic and context-aware." tone={loading ? "warning" : "success"} />
+            </>
+          }
+        />
 
-        <section className="form-card sm:grid-cols-[220px_1fr]">
-          <label className="field">
-            <span className="field-label">User ID</span>
+        <ActionBar>
+          <FormField label="User ID" hint="The advisor uses this researcher ID to ground answers.">
             <input
               className="input-control"
               value={userId}
@@ -134,57 +145,62 @@ export default function AdvisorPage({ initialUserId, onUserIdChange }: AdvisorPa
               placeholder="user_001"
               required
             />
-          </label>
+          </FormField>
 
-          <div className="field">
-            <span className="field-label">Quick Prompts</span>
-            <div className="flex flex-wrap gap-2">
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-slate-700">Quick prompts</p>
+            <div className="mt-3 flex flex-wrap gap-2">
               {QUICK_PROMPTS.map((prompt) => (
-                <button
+                <Button
                   key={prompt}
-                  type="button"
+                  variant="secondary"
+                  size="sm"
                   onClick={() => void handleQuickPrompt(prompt)}
                   disabled={loading}
-                  className="btn-secondary px-3 py-1.5 text-xs"
                 >
                   {prompt}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
-        </section>
+        </ActionBar>
 
         {error ? (
-          <section className="state-panel state-panel-error mt-6">
-            <p className="text-sm font-medium text-rose-700">{error}</p>
-          </section>
+          <StatusPanel tone="error" title="Advisor request failed">
+            {error}
+          </StatusPanel>
         ) : null}
 
         {loading ? (
-          <section className="state-panel state-panel-loading mt-6">
-            <p className="text-sm text-slate-600">Advisor is preparing a response...</p>
-          </section>
+          <StatusPanel tone="loading" title="Advisor is responding">
+            The assistant is preparing a grounded answer from the active research context.
+          </StatusPanel>
         ) : null}
 
         <AdvisorMessageList messages={messages} />
 
-        <form className="form-card mt-6 sm:grid-cols-[1fr_auto]" onSubmit={(event) => void onSubmit(event)}>
-          <label className="field">
-            <span className="field-label">Message</span>
-            <textarea
-              className="textarea-control min-h-[90px]"
-              value={input}
-              onChange={(event) => setInput(event.target.value)}
-              placeholder="Ask about recommendations, skill direction, or where to start..."
-              disabled={loading}
-              required
-            />
-          </label>
+        <SectionCard
+          eyebrow="Compose"
+          title="Ask a focused question"
+          description="Keep prompts practical and specific so the advisor can respond with grounded, trustworthy guidance."
+        >
+          <form className="grid gap-4 sm:grid-cols-[1fr_auto]" onSubmit={(event) => void onSubmit(event)}>
+            <FormField label="Message" hint="Examples: where to start, what to learn next, or how to interpret a recommendation.">
+              <textarea
+                className="textarea-control min-h-[120px]"
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                placeholder="Ask about recommendations, skill direction, or where to start next..."
+                disabled={loading}
+                required
+              />
+            </FormField>
 
-          <button type="submit" disabled={loading || input.trim().length === 0} className="btn-primary h-fit self-end">
-            {loading ? "Sending..." : "Send"}
-          </button>
-        </form>
+            <Button type="submit" disabled={loading || input.trim().length === 0} className="h-fit self-end sm:min-w-[160px]">
+              {loading ? "Sending..." : "Send message"}
+            </Button>
+          </form>
+        </SectionCard>
       </section>
     </main>
   );

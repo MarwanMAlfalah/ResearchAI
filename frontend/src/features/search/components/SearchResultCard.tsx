@@ -1,3 +1,4 @@
+import { Button, MetadataGrid, Pill, SectionCard } from "../../../components/ui";
 import type { SearchPaperResult } from "../types/search";
 
 type SearchResultCardProps = {
@@ -22,13 +23,11 @@ function authorsText(result: SearchPaperResult): string {
   return names.length > 0 ? names.join(", ") : "N/A";
 }
 
-function conceptsText(result: SearchPaperResult): string {
-  const topics = result.concepts
+function concepts(result: SearchPaperResult): string[] {
+  return result.concepts
     .map((concept) => concept.name?.trim() ?? "")
     .filter((name) => name.length > 0)
-    .slice(0, 5);
-
-  return topics.length > 0 ? topics.join(", ") : "N/A";
+    .slice(0, 6);
 }
 
 export default function SearchResultCard({
@@ -40,51 +39,76 @@ export default function SearchResultCard({
   onImport,
 }: SearchResultCardProps): JSX.Element {
   const disableImport = imported || importing || !openalexId;
+  const conceptList = concepts(result);
 
   return (
-    <article className="card-panel transition hover:shadow-md">
-      <header className="flex flex-wrap items-start justify-between gap-3">
+    <SectionCard
+      className="overflow-hidden"
+      action={
+        <Button
+          variant={imported ? "success" : "primary"}
+          onClick={() => (openalexId ? onImport(openalexId) : Promise.resolve())}
+          disabled={disableImport}
+        >
+          {importing ? "Importing..." : imported ? "Imported" : "Import record"}
+        </Button>
+      }
+      contentClassName="grid gap-5"
+    >
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_240px]">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">{result.title ?? "Untitled Paper"}</h3>
-          <p className="mt-1 text-xs text-slate-500">OpenAlex ID: {openalexId ?? "Unavailable"}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <Pill tone={imported ? "success" : "accent"}>{imported ? "Imported" : "OpenAlex result"}</Pill>
+            <span className="text-xs text-slate-500">ID: {openalexId ?? "Unavailable"}</span>
+          </div>
+
+          <h3 className="mt-3 text-xl font-semibold tracking-tight text-slate-950">
+            {result.title ?? "Untitled paper"}
+          </h3>
+
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            {result.abstract?.trim() || "No abstract preview available for this record."}
+          </p>
         </div>
 
-        <button
-          type="button"
-          disabled={disableImport}
-          onClick={() => (openalexId ? onImport(openalexId) : Promise.resolve())}
-          className={`px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
-            imported ? "bg-emerald-100 text-emerald-700" : "bg-slate-900 text-white hover:bg-slate-700"
-          } rounded-lg`}
-        >
-          {importing ? "Importing..." : imported ? "Imported" : "Import"}
-        </button>
-      </header>
+        <div className="rounded-[24px] border border-slate-200 bg-slate-50/90 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Import readiness</p>
+          <p className="mt-3 text-sm leading-7 text-slate-700">
+            {openalexId
+              ? "This record has a stable OpenAlex identifier and can be imported into the ResearchGraph knowledge base."
+              : "This record is missing a usable OpenAlex identifier, so import is currently unavailable."}
+          </p>
+        </div>
+      </div>
 
-      <section className="mt-4 grid gap-2 sm:grid-cols-2">
-        <MetadataItem label="Publication Year" value={result.publication_year ?? "N/A"} />
-        <MetadataItem label="Cited By" value={formatCount(result.cited_by_count)} />
-        <MetadataItem label="Authors" value={authorsText(result)} />
-        <MetadataItem label="Concepts" value={conceptsText(result)} />
-      </section>
+      <MetadataGrid
+        items={[
+          { label: "Publication Year", value: result.publication_year ?? "N/A" },
+          { label: "Cited By", value: formatCount(result.cited_by_count) },
+          { label: "Authors", value: authorsText(result) },
+        ]}
+      />
+
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Concepts</p>
+        {conceptList.length > 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {conceptList.map((concept) => (
+              <Pill key={`${openalexId ?? result.title}-${concept}`} tone="info" className="normal-case tracking-[0.04em]">
+                {concept}
+              </Pill>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-slate-600">No concept metadata available for this record.</p>
+        )}
+      </div>
 
       {importError ? (
-        <p className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">{importError}</p>
+        <div className="rounded-[20px] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {importError}
+        </div>
       ) : null}
-    </article>
-  );
-}
-
-type MetadataItemProps = {
-  label: string;
-  value: string | number;
-};
-
-function MetadataItem({ label, value }: MetadataItemProps): JSX.Element {
-  return (
-    <div className="rounded-md bg-slate-50 px-3 py-2">
-      <p className="text-[11px] uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-0.5 text-sm text-slate-800">{value}</p>
-    </div>
+    </SectionCard>
   );
 }

@@ -1,5 +1,6 @@
 import { FormEvent, useMemo, useState } from "react";
 
+import { ActionBar, Button, FormField, PageHeader, Pill, StatCard } from "../components/ui";
 import { getOpenAlexId, importPaperByOpenAlexId, searchPapers } from "../features/search/api/searchApi";
 import SearchResultsPanel from "../features/search/components/SearchResultsPanel";
 import type { SearchPaperResult } from "../features/search/types/search";
@@ -26,6 +27,10 @@ export default function SearchPage({ activeUserId }: SearchPageProps): JSX.Eleme
   const [importStateById, setImportStateById] = useState<Record<string, ImportStatus>>({});
 
   const resultCount = useMemo(() => results.length, [results.length]);
+  const importedCount = useMemo(
+    () => Object.values(importStateById).filter((item) => item.state === "imported").length,
+    [importStateById]
+  );
 
   async function handleSearch(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -86,55 +91,56 @@ export default function SearchPage({ activeUserId }: SearchPageProps): JSX.Eleme
   return (
     <main className="app-shell">
       <section className="app-container">
-        <header className="page-header">
-          <h1 className="page-title">Search and Import</h1>
-          <p className="page-subtitle">
-            Discover papers from OpenAlex and import selected records directly into the ResearchGraph knowledge graph.
-          </p>
-          {activeUserId ? (
-            <p className="page-caption">
-              Active user context: <span className="font-semibold text-slate-700">{activeUserId}</span>
-            </p>
-          ) : null}
-        </header>
+        <PageHeader
+          eyebrow="Acquisition"
+          title="Search and import"
+          description="Find papers from OpenAlex, inspect structured metadata, and import promising records directly into the ResearchGraph product flow."
+          meta={
+            <>
+              {activeUserId ? <span>Active user context: {activeUserId}</span> : <span>Search works without an active user, but imports enrich the shared graph.</span>}
+              <Pill tone={hasSearched ? "success" : "muted"}>{hasSearched ? "Search complete" : "Awaiting query"}</Pill>
+            </>
+          }
+          stats={
+            <>
+              <StatCard label="Result Count" value={hasSearched ? resultCount : 0} hint="Records returned by the latest search." />
+              <StatCard label="Imported" value={importedCount} hint="Results already moved into the graph." tone="success" />
+              <StatCard label="Limit" value={limit} hint="Maximum records requested from OpenAlex." tone="accent" />
+            </>
+          }
+        />
 
-        <form className="form-card sm:grid-cols-[1fr_140px_auto]" onSubmit={handleSearch}>
-          <label className="field">
-            <span className="field-label">Search Query</span>
-            <input
-              className="input-control"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Find papers by topic, method, or keyword"
-              required
-            />
-          </label>
+        <form onSubmit={handleSearch}>
+          <ActionBar>
+            <div className="grid flex-1 gap-4 sm:grid-cols-[minmax(0,1fr)_170px]">
+              <FormField label="Search Query" hint="Search by topic, method, or domain language researchers would recognize.">
+                <input
+                  className="input-control"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Find papers by topic, method, or keyword"
+                  required
+                />
+              </FormField>
 
-          <label className="field">
-            <span className="field-label">Limit</span>
-            <input
-              type="number"
-              min={1}
-              max={50}
-              className="input-control"
-              value={limit}
-              onChange={(event) => setLimit(Number(event.target.value))}
-              required
-            />
-          </label>
+              <FormField label="Limit" hint="Up to 50 records per search.">
+                <input
+                  type="number"
+                  min={1}
+                  max={50}
+                  className="input-control"
+                  value={limit}
+                  onChange={(event) => setLimit(Number(event.target.value))}
+                  required
+                />
+              </FormField>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary h-fit self-end"
-          >
-            {loading ? "Searching..." : "Search"}
-          </button>
+            <Button type="submit" disabled={loading} className="sm:min-w-[180px]">
+              {loading ? "Searching..." : "Search records"}
+            </Button>
+          </ActionBar>
         </form>
-
-        <div className="mt-3 text-xs text-slate-500">
-          Results: <span className="font-semibold text-slate-700">{hasSearched ? resultCount : 0}</span>
-        </div>
 
         <SearchResultsPanel
           loading={loading}

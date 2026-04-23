@@ -1,3 +1,5 @@
+import { Pill, SectionCard, StatCard } from "../../../components/ui";
+
 type SkillGapSummaryCardProps = {
   strengths: string[];
   missingSkillsCount: number;
@@ -12,45 +14,47 @@ export default function SkillGapSummaryCard({
   gapsSummary,
 }: SkillGapSummaryCardProps): JSX.Element {
   return (
-    <section className="card-panel">
-      <h2 className="text-base font-semibold text-slate-900">Gap Summary</h2>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <SummaryBlock
-          title="Strengths"
+    <SectionCard
+      eyebrow="Overview"
+      title="Skill gap dashboard"
+      description="A summary of current strengths, uncovered gaps, and the next skills the product recommends prioritizing."
+      tone="accent"
+      contentClassName="grid gap-5"
+    >
+      <div className="grid gap-4 lg:grid-cols-3">
+        <StatCard
+          label="Strengths"
           value={strengths.length}
-          details={strengths.length > 0 ? strengths.join(", ") : "No skills added yet."}
+          hint={strengths.length > 0 ? strengths.join(", ") : "No strengths detected yet."}
+          tone="success"
         />
-        <SummaryBlock
-          title="Gaps"
+        <StatCard
+          label="Skill Gaps"
           value={missingSkillsCount}
-          details={gapsSummary}
+          hint={gapsSummary}
+          tone="warning"
         />
-        <SummaryBlock
-          title="Suggested Next"
+        <StatCard
+          label="Suggested Next"
           value={suggestedNextSkills.length}
-          details={
+          hint={
             suggestedNextSkills.length > 0
               ? suggestedNextSkills.join(", ")
               : "No immediate next-skill recommendation."
           }
+          tone="accent"
         />
       </div>
-    </section>
-  );
-}
 
-type SummaryBlockProps = {
-  title: string;
-  value: number;
-  details: string;
-};
-
-function SummaryBlock({ title, value, details }: SummaryBlockProps): JSX.Element {
-  return (
-    <article className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{title}</p>
-      <p className="mt-1 text-xl font-semibold text-slate-900">{value}</p>
-      <p className="mt-2 text-xs leading-relaxed text-slate-600">{details}</p>
-    </article>
+      {strengths.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {strengths.map((strength) => (
+            <Pill key={strength} tone="success" className="normal-case tracking-[0.04em]">
+              {strength}
+            </Pill>
+          ))}
+        </div>
+      ) : null}
+    </SectionCard>
   );
 }

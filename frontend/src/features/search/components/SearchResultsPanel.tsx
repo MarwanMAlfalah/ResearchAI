@@ -1,3 +1,4 @@
+import { EmptyState, StatusPanel } from "../../../components/ui";
 import { getOpenAlexId } from "../api/searchApi";
 import type { SearchPaperResult } from "../types/search";
 import SearchResultCard from "./SearchResultCard";
@@ -26,38 +27,40 @@ export default function SearchResultsPanel({
 }: SearchResultsPanelProps): JSX.Element {
   if (loading) {
     return (
-      <section className="state-panel state-panel-loading mt-6">
-        <p className="text-sm text-slate-600">Searching papers...</p>
-      </section>
+      <StatusPanel tone="loading" title="Searching OpenAlex">
+        Retrieving candidate papers and preparing import-ready metadata.
+      </StatusPanel>
     );
   }
 
   if (error) {
     return (
-      <section className="state-panel state-panel-error mt-6">
-        <p className="text-sm font-medium text-rose-700">{error}</p>
-      </section>
+      <StatusPanel tone="error" title="Search failed">
+        {error}
+      </StatusPanel>
     );
   }
 
   if (hasSearched && results.length === 0) {
     return (
-      <section className="state-panel state-panel-empty mt-6 border-slate-200">
-        <p className="text-sm text-slate-600">No papers matched your query.</p>
-      </section>
+      <EmptyState
+        title="No papers matched this query"
+        description="Try broadening the topic, using a different method keyword, or increasing the result limit."
+      />
     );
   }
 
   if (!hasSearched) {
     return (
-      <section className="state-panel state-panel-empty mt-6 border-dashed">
-        <p className="text-sm text-slate-600">Run a search to view papers and import them into the graph.</p>
-      </section>
+      <EmptyState
+        title="No search run yet"
+        description="Run a search to review external paper records and import strong candidates into the graph."
+      />
     );
   }
 
   return (
-    <section className="mt-6 grid gap-4">
+    <section className="grid gap-5">
       {results.map((result, index) => {
         const openalexId = getOpenAlexId(result);
         const key = openalexId ?? `${result.title ?? "paper"}-${index}`;

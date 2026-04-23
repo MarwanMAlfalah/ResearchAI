@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
+import { ActionBar, Button, PageHeader, Pill, SectionCard, StatCard } from "../components/ui";
 import { getUserProfile, saveUserProfile } from "../features/profile/api/profileApi";
 import ProfileForm from "../features/profile/components/ProfileForm";
 import ProfileSummary from "../features/profile/components/ProfileSummary";
@@ -135,17 +136,36 @@ export default function ProfilePage({
   return (
     <main className="app-shell">
       <section className="app-container">
-        <header className="page-header">
-          <h1 className="page-title">Profile Setup</h1>
-          <p className="page-subtitle">
-            Manage user profile metadata and skills before generating recommendations.
-          </p>
-          <p className="page-caption">
-            User ID is synced with the active app context shown in the top navigation.
-          </p>
-        </header>
+        <PageHeader
+          eyebrow="Research Context"
+          title="Profile workspace"
+          description="Manage the researcher identity, interests, and skills that power recommendations, skill analysis, graph exploration, and advisor responses."
+          meta={
+            <>
+              <span>Global user context stays in sync from this page.</span>
+              <Pill tone={savedProfile ? "success" : "muted"}>{savedProfile ? "Profile saved" : "Draft mode"}</Pill>
+            </>
+          }
+          stats={
+            <>
+              <StatCard label="Active User" value={form.user_id || "Unassigned"} hint="Shared across the workspace." />
+              <StatCard
+                label="Skills Listed"
+                value={parseSkillsInput(skillsInput).length}
+                hint="Comma-separated skills used by downstream analysis."
+                tone="accent"
+              />
+              <StatCard
+                label="Status"
+                value={savedProfile ? "Connected" : "Needs Save"}
+                hint={savedProfile ? "Persisted profile loaded successfully." : "Load or save to confirm persisted state."}
+                tone={savedProfile ? "success" : "warning"}
+              />
+            </>
+          }
+        />
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.9fr)]">
           <ProfileForm
             form={form}
             skillsInput={skillsInput}
@@ -159,20 +179,30 @@ export default function ProfilePage({
           <ProfileSummary profile={savedProfile} statusMessage={statusMessage} errorMessage={errorMessage} />
         </div>
 
-        <section className="card-panel mt-6 p-4">
-          <h2 className="text-sm font-semibold text-slate-900">Next Action</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            After saving a profile, continue to recommendations and use the same user ID.
-          </p>
-          <button
-            type="button"
-            onClick={onNavigateToRecommendations}
-            disabled={!canNavigate}
-            className="btn-primary mt-3"
-          >
-            Go to Recommendations
-          </button>
-        </section>
+        <ActionBar>
+          <div className="space-y-1">
+            <p className="text-sm font-semibold text-slate-950">Ready for the next step</p>
+            <p className="text-sm leading-6 text-slate-600">
+              Once the profile is saved, move directly into recommendation review with the same active researcher context.
+            </p>
+          </div>
+          <Button onClick={onNavigateToRecommendations} disabled={!canNavigate} className="sm:min-w-[220px]">
+            Go to recommendations
+          </Button>
+        </ActionBar>
+
+        <SectionCard
+          eyebrow="Why This Matters"
+          title="Profile quality drives the rest of the workspace"
+          description="A clear research profile improves retrieval relevance, makes graph exploration easier to interpret, and gives the advisor better grounding."
+          tone="subtle"
+        >
+          <div className="grid gap-3 md:grid-cols-3">
+            <StatCard label="Recommendations" value="Better ranking" hint="Skills and interests sharpen semantic relevance." />
+            <StatCard label="Skill Gap" value="Clearer gaps" hint="The system compares strengths against evidence-backed next skills." />
+            <StatCard label="Advisor" value="More grounded" hint="Assistant answers stay aligned with the active researcher context." />
+          </div>
+        </SectionCard>
       </section>
     </main>
   );

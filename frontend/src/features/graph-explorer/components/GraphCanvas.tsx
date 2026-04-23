@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import cytoscape, { Core, ElementDefinition, EventObject, NodeSingular } from "cytoscape";
 
+import { Button, Pill } from "../../../components/ui";
 import type { GraphData, GraphFilterState, GraphNode, GraphNodeType } from "../types/graphExplorer";
 import { NODE_TYPE_STYLES, truncateNodeLabel } from "../utils/graphStyle";
 
@@ -108,8 +109,8 @@ export default function GraphCanvas({ graphData, filters, onSelectNode }: GraphC
             "text-valign": "bottom",
             "text-margin-y": 8,
             "text-background-color": "#ffffff",
-            "text-background-opacity": 0.85,
-            "text-background-padding": "2px",
+            "text-background-opacity": 0.9,
+            "text-background-padding": "3px",
             width: (ele: NodeSingular) => nodeSize(ele.data("type") as GraphNodeType),
             height: (ele: NodeSingular) => nodeSize(ele.data("type") as GraphNodeType),
             opacity: 1,
@@ -275,42 +276,40 @@ export default function GraphCanvas({ graphData, filters, onSelectNode }: GraphC
   }
 
   return (
-    <div className="relative">
-      <div className="absolute right-3 top-3 z-20 flex gap-2">
-        <button
-          type="button"
-          onClick={handleFitView}
-          className="btn-secondary px-2.5 py-1 text-xs"
-        >
-          Fit
-        </button>
-        <button
-          type="button"
-          onClick={handleResetView}
-          className="btn-secondary px-2.5 py-1 text-xs"
-        >
-          Reset View
-        </button>
-        <button
-          type="button"
-          onClick={handleResetSelection}
-          className="btn-secondary px-2.5 py-1 text-xs"
-        >
-          Reset Selection
-        </button>
+    <div className="relative overflow-hidden rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,rgba(248,250,252,0.9),rgba(255,255,255,0.98))]">
+      <div className="flex flex-col gap-4 border-b border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-slate-950">Interactive graph canvas</p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            Pan, zoom, and click nodes to inspect local neighborhoods and metadata.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="secondary" size="sm" onClick={handleFitView}>
+            Fit view
+          </Button>
+          <Button variant="secondary" size="sm" onClick={handleResetView}>
+            Reset view
+          </Button>
+          <Button variant="secondary" size="sm" onClick={handleResetSelection}>
+            Clear focus
+          </Button>
+        </div>
       </div>
 
       {hoverPreview ? (
         <div
-          className="pointer-events-none absolute z-20 max-w-[220px] rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs shadow-md"
+          className="pointer-events-none absolute z-20 max-w-[240px] rounded-2xl border border-slate-200 bg-white/95 px-3 py-2 text-xs shadow-lg backdrop-blur"
           style={{ left: hoverPreview.x + 10, top: hoverPreview.y + 10 }}
         >
           <p className="font-semibold text-slate-900">{hoverPreview.label}</p>
-          <p className="text-slate-600">{hoverPreview.type}</p>
+          <div className="mt-1">
+            <Pill tone="accent">{hoverPreview.type}</Pill>
+          </div>
         </div>
       ) : null}
 
-      <div ref={containerRef} className="h-[620px] w-full rounded-lg border border-slate-200 bg-white" />
+      <div ref={containerRef} className="h-[640px] w-full" />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { Button, FormField, SectionCard } from "../../../components/ui";
+import Pill from "../../../components/ui/Pill";
 import type { UserProfileUpsertRequest } from "../types/profile";
 
 type EditableProfileField = "user_id" | "name" | "interests_text";
@@ -12,6 +14,13 @@ type ProfileFormProps = {
   onSave: () => Promise<void>;
 };
 
+function skillCount(value: string): number {
+  return value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean).length;
+}
+
 export default function ProfileForm({
   form,
   skillsInput,
@@ -22,15 +31,15 @@ export default function ProfileForm({
   onSave,
 }: ProfileFormProps): JSX.Element {
   return (
-    <section className="card-panel">
-      <h2 className="text-lg font-semibold text-slate-900">User Profile</h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Create or update a user profile that powers downstream recommendation scoring.
-      </p>
-
-      <div className="mt-5 grid gap-4">
-        <label className="field">
-          <span className="field-label">User ID</span>
+    <SectionCard
+      eyebrow="Profile"
+      title="Researcher profile"
+      description="Create or update the core user profile that recommendation, advisor, and skill-gap flows all read from."
+      action={<Pill tone="info">{loading ? "Syncing" : "Ready"}</Pill>}
+      contentClassName="grid gap-5"
+    >
+      <div className="grid gap-4 md:grid-cols-2">
+        <FormField label="User ID" hint="This stays aligned with the global app context.">
           <input
             className="input-control"
             value={form.user_id}
@@ -38,10 +47,9 @@ export default function ProfileForm({
             placeholder="e.g. user_001"
             required
           />
-        </label>
+        </FormField>
 
-        <label className="field">
-          <span className="field-label">Name</span>
+        <FormField label="Name" hint="Use the researcher name you want to display across the workspace.">
           <input
             className="input-control"
             value={form.name}
@@ -49,48 +57,49 @@ export default function ProfileForm({
             placeholder="Full name"
             required
           />
-        </label>
-
-        <label className="field">
-          <span className="field-label">Interests</span>
-          <textarea
-            className="textarea-control"
-            value={form.interests_text}
-            onChange={(event) => onChange("interests_text", event.target.value)}
-            placeholder="Research interests, topics, and methods..."
-          />
-        </label>
-
-        <label className="field">
-          <span className="field-label">Skills (comma-separated)</span>
-          <input
-            className="input-control"
-            value={skillsInput}
-            onChange={(event) => onSkillsInputChange(event.target.value)}
-            placeholder="Python, Graph ML, NLP"
-          />
-        </label>
+        </FormField>
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={onLoad}
+      <FormField
+        label="Interests"
+        hint="Add research interests, problem areas, and methods so recommendations feel grounded and specific."
+      >
+        <textarea
+          className="textarea-control min-h-[150px]"
+          value={form.interests_text}
+          onChange={(event) => onChange("interests_text", event.target.value)}
+          placeholder="Research interests, topics, methods, preferred subfields..."
+        />
+      </FormField>
+
+      <FormField
+        label="Skills"
+        hint={`Comma-separated skill inventory. ${skillCount(skillsInput)} skill${skillCount(skillsInput) === 1 ? "" : "s"} detected.`}
+      >
+        <input
+          className="input-control"
+          value={skillsInput}
+          onChange={(event) => onSkillsInputChange(event.target.value)}
+          placeholder="Python, Graph ML, NLP"
+        />
+      </FormField>
+
+      <div className="flex flex-wrap gap-3">
+        <Button
+          variant="secondary"
+          onClick={() => void onLoad()}
           disabled={loading || form.user_id.trim().length === 0}
-          className="btn-secondary"
         >
-          {loading ? "Loading..." : "Load Profile"}
-        </button>
+          {loading ? "Loading..." : "Load profile"}
+        </Button>
 
-        <button
-          type="button"
-          onClick={onSave}
+        <Button
+          onClick={() => void onSave()}
           disabled={loading || form.user_id.trim().length === 0 || form.name.trim().length === 0}
-          className="btn-primary"
         >
-          {loading ? "Saving..." : "Save / Update Profile"}
-        </button>
+          {loading ? "Saving..." : "Save profile"}
+        </Button>
       </div>
-    </section>
+    </SectionCard>
   );
 }

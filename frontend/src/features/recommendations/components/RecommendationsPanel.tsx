@@ -1,3 +1,4 @@
+import { EmptyState, StatusPanel } from "../../../components/ui";
 import type { ExplainedRecommendation } from "../types/recommendation";
 import RecommendationCard from "./RecommendationCard";
 
@@ -16,40 +17,42 @@ export default function RecommendationsPanel({
 }: RecommendationsPanelProps): JSX.Element {
   if (loading) {
     return (
-      <section className="state-panel state-panel-loading mt-6">
-        <p className="text-sm text-slate-600">Loading recommendations...</p>
-      </section>
+      <StatusPanel tone="loading" title="Loading recommendations">
+        Pulling ranked papers and explanation evidence from the recommendation service.
+      </StatusPanel>
     );
   }
 
   if (error) {
     return (
-      <section className="state-panel state-panel-error mt-6">
-        <p className="text-sm font-medium text-rose-700">{error}</p>
-      </section>
+      <StatusPanel tone="error" title="Recommendation request failed">
+        {error}
+      </StatusPanel>
     );
   }
 
   if (hasFetched && recommendations.length === 0) {
     return (
-      <section className="state-panel state-panel-empty mt-6 border-slate-200">
-        <p className="text-sm text-slate-600">No recommendations found for this user profile.</p>
-      </section>
+      <EmptyState
+        title="No recommendations returned"
+        description="This user profile did not produce any recommendation candidates yet. Try updating the profile or increasing the result limit."
+      />
     );
   }
 
   if (!hasFetched) {
     return (
-      <section className="state-panel state-panel-empty mt-6 border-dashed">
-        <p className="text-sm text-slate-600">Enter a user ID and fetch recommendations to begin.</p>
-      </section>
+      <EmptyState
+        title="No recommendation run yet"
+        description="Choose a user and fetch recommendations to review ranking scores, evidence, and explanation signals."
+      />
     );
   }
 
   return (
-    <section className="mt-6 grid gap-4">
-      {recommendations.map((recommendation) => (
-        <RecommendationCard key={recommendation.paper_id} recommendation={recommendation} />
+    <section className="grid gap-5">
+      {recommendations.map((recommendation, index) => (
+        <RecommendationCard key={recommendation.paper_id} recommendation={recommendation} rank={index + 1} />
       ))}
     </section>
   );

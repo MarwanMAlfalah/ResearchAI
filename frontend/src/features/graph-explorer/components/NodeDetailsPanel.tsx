@@ -1,3 +1,4 @@
+import { EmptyState, MetadataGrid, Pill, SectionCard } from "../../../components/ui";
 import type { GraphNode } from "../types/graphExplorer";
 
 type NodeDetailsPanelProps = {
@@ -24,44 +25,50 @@ function formatValue(value: unknown): string {
 export default function NodeDetailsPanel({ node }: NodeDetailsPanelProps): JSX.Element {
   if (!node) {
     return (
-      <section className="card-panel p-4">
-        <h2 className="text-sm font-semibold text-slate-900">Node Details</h2>
-        <p className="mt-3 text-sm text-slate-600">
-          Click a node in the graph to inspect its metadata and relation context.
-        </p>
-      </section>
+      <SectionCard
+        eyebrow="Inspector"
+        title="Node details"
+        description="Select any node in the graph to inspect its metadata and relation context."
+        className="h-fit xl:sticky xl:top-32"
+      >
+        <EmptyState
+          title="No node selected"
+          description="Click a node in the graph canvas to inspect its label, type, and metadata."
+        />
+      </SectionCard>
     );
   }
 
   const metadataEntries = Object.entries(node.metadata);
 
   return (
-    <section className="card-panel p-4">
-      <h2 className="text-sm font-semibold text-slate-900">Node Details</h2>
-      <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-        <p className="text-[11px] uppercase tracking-wide text-slate-500">Node ID</p>
-        <p className="mt-1 break-all text-xs text-slate-700">{node.id}</p>
+    <SectionCard
+      eyebrow="Inspector"
+      title="Node details"
+      description="Detailed metadata for the currently selected graph entity."
+      className="h-fit xl:sticky xl:top-32"
+      contentClassName="grid gap-4"
+      action={<Pill tone="accent">{node.type}</Pill>}
+    >
+      <MetadataGrid
+        columns={1}
+        items={[
+          { label: "Node ID", value: <span className="break-all">{node.id}</span> },
+          { label: "Label", value: node.label },
+        ]}
+      />
 
-        <p className="text-[11px] uppercase tracking-wide text-slate-500">Type</p>
-        <p className="mt-1 text-sm font-semibold text-slate-900">{node.type}</p>
-
-        <p className="mt-3 text-[11px] uppercase tracking-wide text-slate-500">Label</p>
-        <p className="mt-1 text-sm text-slate-800">{node.label}</p>
-
-        <p className="mt-3 text-[11px] uppercase tracking-wide text-slate-500">Metadata</p>
-        {metadataEntries.length === 0 ? (
-          <p className="mt-1 text-xs text-slate-500">No metadata available for this node.</p>
-        ) : (
-          <dl className="mt-1 grid gap-1 text-xs text-slate-700">
-            {metadataEntries.map(([key, value]) => (
-              <div key={`${node.id}-${key}`} className="grid grid-cols-[120px_1fr] gap-2">
-                <dt className="font-medium text-slate-500">{formatKey(key)}</dt>
-                <dd className="break-words text-slate-700">{formatValue(value)}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </div>
-    </section>
+      {metadataEntries.length === 0 ? (
+        <p className="text-sm text-slate-600">No metadata available for this node.</p>
+      ) : (
+        <MetadataGrid
+          columns={1}
+          items={metadataEntries.map(([key, value]) => ({
+            label: formatKey(key),
+            value: <span className="break-words">{formatValue(value)}</span>,
+          }))}
+        />
+      )}
+    </SectionCard>
   );
 }

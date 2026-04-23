@@ -176,11 +176,12 @@ ResearcherAI/
 - Node.js 18+
 - Neo4j Community (local)
 
-### Clone
+### Clone repo
 ```bash
-git clone <your-repo-url>
+git clone <https://github.com/MarwanMAlfalah/ResearchAI.git
 cd ResearcherAI
 ```
+
 
 ## 15. Backend Run Instructions
 ```bash

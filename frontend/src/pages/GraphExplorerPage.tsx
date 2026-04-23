@@ -1,5 +1,6 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
+import { ActionBar, Button, FormField, PageHeader, Pill, SectionCard, StatCard, StatusPanel } from "../components/ui";
 import { fetchGraphExplorerData } from "../features/graph-explorer/api/graphExplorerApi";
 import GraphCanvas from "../features/graph-explorer/components/GraphCanvas";
 import GraphFilters from "../features/graph-explorer/components/GraphFilters";
@@ -114,85 +115,99 @@ export default function GraphExplorerPage({ initialUserId, onUserIdChange }: Gra
   return (
     <main className="app-shell">
       <section className="app-container">
-        <header className="page-header">
-          <h1 className="page-title">Graph Explorer</h1>
-          <p className="page-subtitle">
-            Explore user profile, skills, recommended papers, topics, and authors as an interactive knowledge graph.
-          </p>
-          <p className="page-caption">Uses real backend data assembled from profile, recommendation, skill-gap, and search APIs.</p>
-        </header>
+        <PageHeader
+          eyebrow="Knowledge Graph"
+          title="Graph explorer"
+          description="Inspect the product graph around a researcher with cleaner controls, a stronger canvas frame, and a dedicated side inspector for node-level detail."
+          meta={
+            <>
+              <span>Graph data is assembled from profile, recommendation, skill-gap, and search flows.</span>
+              <Pill tone={hasLoaded && graphData ? "success" : "muted"}>{hasLoaded && graphData ? "Graph loaded" : "Awaiting graph"}</Pill>
+            </>
+          }
+          stats={
+            <>
+              <StatCard label="Visible Nodes" value={visibleNodeCount} hint="Nodes currently visible under the active filters." />
+              <StatCard label="Visible Edges" value={visibleEdgeCount} hint="Edges connecting visible nodes." tone="accent" />
+              <StatCard label="Selected Node" value={selectedNode?.type ?? "None"} hint={selectedNode ? selectedNode.label : "Click any node to inspect it."} tone="success" />
+            </>
+          }
+        />
 
-        <form className="form-card sm:grid-cols-[1fr_160px_auto]" onSubmit={handleLoadGraph}>
-          <label className="field">
-            <span className="field-label">User ID</span>
-            <input
-              className="input-control"
-              value={userId}
-              onChange={(event) => handleUserIdInput(event.target.value)}
-              placeholder="Enter user ID"
-              required
-            />
-          </label>
+        <form onSubmit={handleLoadGraph}>
+          <ActionBar>
+            <div className="grid flex-1 gap-4 sm:grid-cols-[minmax(0,1fr)_170px]">
+              <FormField label="User ID" hint="The graph loads around this researcher context.">
+                <input
+                  className="input-control"
+                  value={userId}
+                  onChange={(event) => handleUserIdInput(event.target.value)}
+                  placeholder="Enter user ID"
+                  required
+                />
+              </FormField>
 
-          <label className="field">
-            <span className="field-label">Limit</span>
-            <input
-              type="number"
-              min={1}
-              max={100}
-              className="input-control"
-              value={limit}
-              onChange={(event) => setLimit(Number(event.target.value))}
-              required
-            />
-          </label>
+              <FormField label="Limit" hint="Caps the amount of graph-linked data requested.">
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  className="input-control"
+                  value={limit}
+                  onChange={(event) => setLimit(Number(event.target.value))}
+                  required
+                />
+              </FormField>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-primary h-fit self-end"
-          >
-            {loading ? "Loading..." : "Load Graph"}
-          </button>
+            <Button type="submit" disabled={loading} className="sm:min-w-[180px]">
+              {loading ? "Loading graph..." : "Load graph"}
+            </Button>
+          </ActionBar>
         </form>
 
-        <div className="mt-3 text-xs text-slate-500">
-          Visible: <span className="font-semibold text-slate-700">{visibleNodeCount}</span> nodes, <span className="font-semibold text-slate-700">{visibleEdgeCount}</span> edges
-        </div>
-
         {error ? (
-          <section className="state-panel state-panel-error mt-6">
-            <p className="text-sm font-medium text-rose-700">{error}</p>
-          </section>
+          <StatusPanel tone="error" title="Graph request failed">
+            {error}
+          </StatusPanel>
         ) : null}
 
         {loading ? (
-          <section className="state-panel state-panel-loading mt-6">
-            <p className="text-sm text-slate-600">Loading graph data from backend services...</p>
-          </section>
+          <StatusPanel tone="loading" title="Building graph">
+            Loading graph data from backend services and preparing the interactive canvas.
+          </StatusPanel>
         ) : null}
 
         {!loading && !error && !hasLoaded ? (
-          <section className="state-panel state-panel-empty mt-6 border-dashed">
-            <p className="text-sm text-slate-600">Load a graph to inspect linked entities and relationships.</p>
-          </section>
+          <StatusPanel tone="empty" title="No graph loaded">
+            Load a graph to inspect linked entities and relationships around this researcher.
+          </StatusPanel>
         ) : null}
 
         {!loading && !error && hasLoaded && graphData && graphData.nodes.length === 0 ? (
-          <section className="state-panel state-panel-empty mt-6 border-dashed">
-            <p className="text-sm text-slate-600">No graph data was available for this user and limit.</p>
-          </section>
+          <StatusPanel tone="empty" title="Graph returned no nodes">
+            No graph data was available for this user and limit.
+          </StatusPanel>
         ) : null}
 
         {!loading && !error && graphData && graphData.nodes.length > 0 ? (
-          <div className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
-            <div className="grid gap-4">
-              <GraphFilters filters={filters} onToggle={handleToggleFilter} counts={nodeTypeCounts} />
-              <GraphLegend />
-              <section className="card-panel p-4">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="grid gap-6">
+              <div className="grid gap-6 lg:grid-cols-[1.25fr_0.9fr]">
+                <GraphFilters filters={filters} onToggle={handleToggleFilter} counts={nodeTypeCounts} />
+                <GraphLegend />
+              </div>
+
+              <SectionCard
+                eyebrow="Canvas"
+                title="Interactive graph"
+                description="Explore direct neighborhoods, filter entity types, and use the inspector to understand why nodes appear in the graph."
+                contentClassName="p-0"
+              >
                 <GraphCanvas graphData={graphData} filters={filters} onSelectNode={handleSelectNode} />
-              </section>
+              </SectionCard>
             </div>
+
             <NodeDetailsPanel node={selectedNode} />
           </div>
         ) : null}
