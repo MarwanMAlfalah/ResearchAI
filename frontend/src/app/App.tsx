@@ -106,57 +106,23 @@ export default function App(): JSX.Element {
   return (
     <div className="workspace-shell">
       <nav className="workspace-nav">
-        <div className="workspace-container py-4">
-          <div className="rounded-[28px] border border-white/80 bg-white/95 px-4 py-4 shadow-[0_12px_36px_rgba(15,23,42,0.08)] sm:px-6">
-            <div className="grid gap-4">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-sm font-semibold text-white shadow-sm">
-                      RG
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-lg font-semibold tracking-tight text-slate-950">ResearchGraph AI</p>
-                        <Pill tone="muted">Research Workspace</Pill>
-                      </div>
-                      <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{activePageConfig.summary}</p>
-                    </div>
-                  </div>
+        <div className="workspace-container py-2.5">
+          <div className="rounded-[24px] border border-white/80 bg-white/95 px-4 py-3 shadow-[0_10px_28px_rgba(15,23,42,0.07)] sm:px-5">
+            <div className="flex flex-wrap items-center gap-3 xl:grid xl:grid-cols-[auto_minmax(0,1fr)_auto] xl:gap-4">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-slate-950 text-sm font-semibold text-white shadow-sm">
+                  RG
                 </div>
-
-                <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-4 py-3 lg:w-[320px]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500">Active User</p>
-                      <p className="mt-1 truncate text-sm font-semibold text-slate-950">{activeUserId}</p>
-                    </div>
-                    <Pill tone="accent">{activePageConfig.label}</Pill>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="truncate text-base font-semibold tracking-tight text-slate-950">ResearchGraph AI</p>
+                    <Pill tone="muted">Research Workspace</Pill>
                   </div>
-
-                  <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-                    <input
-                      className="input-control min-w-0 flex-1 bg-white"
-                      value={activeUserDraft}
-                      onChange={(event) => setActiveUserDraft(event.target.value)}
-                      placeholder="user_001"
-                    />
-                    <Button onClick={applyActiveUserId} className="sm:min-w-[92px]">
-                      Apply
-                    </Button>
-                  </div>
-
-                  <p className="mt-3 text-xs leading-5 text-slate-500">
-                    Context-aware pages automatically use this researcher ID so you can move through the workspace without re-entering it.
-                  </p>
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-slate-200 bg-slate-50 px-3 py-3">
-                <div className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  Workspace Navigation
-                </div>
-                <div className="flex flex-wrap gap-2">
+              <div className="order-3 w-full xl:order-none xl:w-auto">
+                <div className="flex flex-wrap gap-2 xl:justify-center">
                   {PAGES.map((page) => {
                     const isActive = page.id === activePage;
 
@@ -166,7 +132,7 @@ export default function App(): JSX.Element {
                         type="button"
                         onClick={() => setActivePage(page.id)}
                         className={cn(
-                          "btn-nav min-h-[42px] border px-4 py-2.5 text-left whitespace-nowrap",
+                          "btn-nav min-h-10 border px-3.5 py-2 text-left whitespace-nowrap",
                           isActive
                             ? "border-slate-900 bg-slate-900 text-white shadow-sm"
                             : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-950"
@@ -179,6 +145,27 @@ export default function App(): JSX.Element {
                   })}
                 </div>
               </div>
+
+              <div className="ml-auto flex min-w-0 items-center gap-2 rounded-[20px] border border-slate-200 bg-slate-50 px-2.5 py-2 xl:ml-0">
+                <div className="min-w-0 border-r border-slate-200 pr-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">Active User</p>
+                  <p className="truncate text-sm font-semibold text-slate-950">{activeUserId}</p>
+                </div>
+                <input
+                  className="input-control h-10 min-w-0 flex-1 bg-white px-3 py-2 sm:w-[150px]"
+                  value={activeUserDraft}
+                  onChange={(event) => setActiveUserDraft(event.target.value)}
+                  placeholder="user_001"
+                />
+                <Button onClick={applyActiveUserId} className="min-h-10 px-3.5 py-2 text-sm">
+                  Apply
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200/80 pt-2">
+              <p className="min-w-0 text-xs leading-5 text-slate-500">{activePageConfig.summary}</p>
+              <Pill tone="accent">{activePageConfig.label}</Pill>
             </div>
           </div>
         </div>

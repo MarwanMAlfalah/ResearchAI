@@ -1,189 +1,279 @@
 # ResearchGraph AI
-**Ontology-guided research discovery with explainable graph-aware recommendations.**
 
-## 1. Project Overview
-ResearchGraph AI is a full-stack academic prototype for research discovery and guidance. It combines OpenAlex ingestion, Neo4j knowledge graph storage, embedding-based ranking, explainable recommendation scoring, skill-gap analysis, and an interactive advisor + graph explorer interface.
+**Explainable research discovery built as a graph-native SaaS-style workspace for paper search, recommendations, skill mapping, and advisor-guided exploration.**
 
-## 2. Problem Statement
-Research exploration is often fragmented across multiple tools:
-- paper search is disconnected from personal research context
-- recommendation outputs are difficult to explain and trust
-- skill development priorities are not surfaced clearly
-- graph relationships between papers, topics, skills, and authors are underused
+![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?style=flat-square&logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-Frontend-61DAFB?style=flat-square&logo=react&logoColor=0B1220)
+![TypeScript](https://img.shields.io/badge/TypeScript-Typed_UI-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Neo4j](https://img.shields.io/badge/Neo4j-Knowledge_Graph-4581C3?style=flat-square&logo=neo4j&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-Design_System-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![OpenAlex](https://img.shields.io/badge/OpenAlex-Research_Data-111827?style=flat-square)
 
-## 3. Core Idea / Solution
-Model research entities in a knowledge graph and rank papers with transparent, multi-signal scoring:
-- semantic similarity between user interests and paper text embeddings
-- graph centrality signal (with robust fallback when citation edges are sparse)
-- recency signal based on publication year
+## Tagline
 
-Then expose explainable outputs and actionable guidance through recommendation cards, skill-gap summaries, advisor responses, and graph exploration.
+ResearchGraph AI is a full-stack platform for research discovery and guidance. It combines OpenAlex ingestion, Neo4j graph storage, embedding-based ranking, explainable scoring, skill-gap analysis, and a modern React workspace for interacting with the system.
 
-## 4. Implemented Features
-- User profile create/update/read (`name`, `interests_text`, `skills`) with stored interest embeddings
-- OpenAlex paper search with normalized response schema
-- Direct paper import by OpenAlex ID and batch import
-- Neo4j upsert for `Paper`, `Author`, `Topic`, `UserProfile`, `Skill` nodes and active relationships
-- Explained recommendations with:
-  - semantic similarity
-  - graph centrality
-  - recency
-  - final weighted score
-  - signal-level explanation + evidence fields
-- Backend skill-gap endpoint with deterministic evidence-based outputs
-- Advisor chat endpoint for focused research guidance (deterministic intent routing)
-- Graph Explorer page (Cytoscape.js) with filtering, selection, details, and interaction controls
+## Visual Overview
 
-## 5. Architecture Summary
-- **Frontend (React + TypeScript + Tailwind):** page-driven user workflows with shared active user context
-- **Backend (FastAPI):** router-based API orchestration, validation, and error handling
-- **Services layer:** profile, ingestion, recommendation, explainability, skill-gap, advisor logic
-- **Graph layer (Neo4j):** canonical entity and relationship storage for retrieval/scoring
-- **Ontology layer (OWLReady2 + RDFLib):** formal domain schema definition and export
+![ResearchGraph AI hero screenshot](docs/assets/screenshots/profile-workspace.png)
 
-## 6. Backend Capabilities
-Implemented API surface (prefix: `/api/v1`):
-- `GET /health`
-- `GET /health/neo4j`
-- `GET /search/papers`
-- `POST /import/paper`
-- `POST /import/paper/{openalex_id}`
-- `POST /import/papers/by-id`
-- `POST /user/profile`
-- `GET /user/profile/{id}`
-- `GET /recommend/papers/semantic`
-- `GET /recommend/papers/scored`
-- `GET /recommend/papers/explained`
-- `GET /skill-gap`
-- `POST /advisor/chat`
+*Profile workspace with shared researcher context across the full product flow.*
 
-Additional implemented backend behavior:
-- FastAPI startup/shutdown Neo4j connection lifecycle
-- centralized configuration via environment variables
-- OpenAlex timeout/error handling
-- paper + user embedding generation via sentence-transformers
-- centrality fallback to normalized `cited_by_count` when `CITES` edges are unavailable
+## What The Project Does
 
-## 7. Frontend Capabilities
-Implemented pages:
-- **Profile:** load/save profile and skills
-- **Search & Import:** search OpenAlex and import selected papers
-- **Recommendations:** scored + explained recommendation cards with evidence
-- **Skill Gap:** backend-driven strengths, missing skills, and suggested next skills
-- **Advisor:** interactive guidance over existing profile/recommendation/skill-gap context
-- **Graph Explorer:** interactive knowledge graph view with type filters and node details
+ResearchGraph AI helps a researcher move through one connected workflow:
 
-Shared UX capabilities:
-- active user context in top navigation
-- prefilled user-aware forms across pages
-- consistent loading/empty/error/success state handling
+1. Create or load a researcher profile.
+2. Search OpenAlex and import relevant papers into the knowledge graph.
+3. Generate explainable recommendations using semantic, centrality, and recency signals.
+4. Surface strengths, missing skills, and suggested next skills.
+5. Ask an advisor for grounded, deterministic guidance.
+6. Inspect papers, skills, topics, and authors in an interactive graph explorer.
 
-## 8. Recommendation Pipeline
-1. User profile stores interest text and embedding.
-2. Paper ingestion stores paper embedding from `title + abstract` (title fallback).
-3. Candidate papers are scored with three signals:
+## Why It Matters
+
+Research workflows are often fragmented: search, recommendations, context tracking, and learning priorities live in separate tools. ResearchGraph AI brings those pieces together into one explainable product workflow, which makes it useful both as:
+
+- an academic demo for ontology-guided, graph-aware recommender systems
+- a portfolio project that demonstrates full-stack product thinking
+- a foundation for future research-assistant or knowledge-work tooling
+
+## Key Features
+
+| Area | Implemented capability |
+| --- | --- |
+| Profile | Create, update, and load researcher profiles with interests, skills, and stored interest embeddings |
+| Search & Import | Search OpenAlex, normalize results, and import papers into Neo4j by OpenAlex ID |
+| Recommendations | Retrieve semantic, scored, and fully explained paper recommendations |
+| Explainability | Expose weighted signals, evidence fields, and deterministic explanation text |
+| Skill Gap | Compute strengths, missing skills, suggested next skills, and supporting paper evidence |
+| Advisor | Return deterministic advisor responses over current profile and recommendation context |
+| Graph Explorer | Visualize `UserProfile`, `Skill`, `Paper`, `Topic`, and `Author` nodes with filters and details |
+
+## Platform Screenshots / Product Tour
+
+### Profile Workspace
+![Profile workspace](docs/assets/screenshots/profile-workspace.png)
+
+*Create or load a researcher profile and keep the active user context consistent across the app.*
+
+### Recommendations
+![Recommendations](docs/assets/screenshots/recommendations.png)
+
+*Review ranked papers with score breakdowns, explanation text, and supporting evidence.*
+
+### Search & Import
+![Search and import](docs/assets/screenshots/search-import.png)
+
+*Search OpenAlex, inspect normalized metadata, and import promising papers into the graph.*
+
+### Graph Explorer
+![Graph explorer](docs/assets/screenshots/graph-explorer.png)
+
+*Explore the connected research graph with filters, legend support, and node-level inspection.*
+
+### Skill Gap Analysis
+![Skill gap analysis](docs/assets/screenshots/skill-gap.png)
+
+*Surface strengths, missing skills, next-skill priorities, and evidence-backed rationale.*
+
+### Advisor
+![Advisor](docs/assets/screenshots/advisor.png)
+
+*Ask focused questions about the current research context through a deterministic advisor workflow.*
+
+## System Architecture
+
+```text
+React + TypeScript + Tailwind frontend
+        |
+        v
+FastAPI API layer (/api/v1)
+        |
+        +--> OpenAlex ingestion and normalization
+        +--> Recommendation + explainability services
+        +--> Skill-gap and advisor services
+        +--> Graph composition for frontend exploration
+        |
+        v
+Neo4j operational knowledge graph
+        |
+        v
+Ontology layer (OWLReady2 + RDFLib)
+```
+
+## Tech Stack
+
+| Layer | Technologies |
+| --- | --- |
+| Frontend | React 18, TypeScript, Vite, Tailwind CSS, Cytoscape.js |
+| Backend | FastAPI, Uvicorn, Pydantic, Pydantic Settings |
+| Graph / Data | Neo4j, OpenAlex |
+| AI / Ranking | sentence-transformers |
+| Ontology / Semantics | RDFLib, OWLReady2 |
+| NLP / Extraction scaffolding | spaCy, KeyBERT |
+
+## Backend Capabilities
+
+The backend exposes a router-based FastAPI service under `/api/v1` with:
+
+- health and Neo4j connectivity checks
+- researcher profile create/read/update flow
+- OpenAlex paper search
+- direct single-paper and batch OpenAlex import
+- semantic recommendations
+- multi-signal scored recommendations
+- fully explained recommendations
+- deterministic skill-gap analysis
+- deterministic advisor chat
+
+It also manages:
+
+- Neo4j connection lifecycle at application startup/shutdown
+- environment-driven configuration
+- OpenAlex timeout and error handling
+- embedding generation using `sentence-transformers/all-MiniLM-L6-v2`
+- centrality fallback to normalized `cited_by_count` when citation edges are sparse
+
+## Frontend Capabilities
+
+The frontend is a modular React workspace with:
+
+- shared active user context in the top app shell
+- lazy-loaded feature pages for heavier views
+- reusable UI components for headers, cards, forms, metadata, and states
+- clear loading, empty, error, and success patterns
+- SaaS-style product shell across:
+  - Profile
+  - Recommendations
+  - Search & Import
+  - Skill Gap
+  - Advisor
+  - Graph Explorer
+
+## Recommendation Pipeline
+
+1. A researcher profile stores `interests_text` and a profile embedding.
+2. Imported papers store embeddings generated from title + abstract content.
+3. Candidate papers are ranked using three signals:
    - semantic similarity
    - graph centrality
    - recency
-4. Final score combines configurable weights:
-   - `final = alpha * semantic + beta * centrality + gamma * recency`
-5. Explainability layer adds:
-   - `top_contributing_signals`
-   - deterministic `explanation_text`
-   - structured evidence fields (publication year, cited count, centrality source, embedding model, strength buckets)
+4. Final score is computed as a weighted combination:
 
-## 9. Skill Gap Analysis
-`GET /api/v1/skill-gap` computes a deterministic, backend-owned skill-gap view using:
-- user profile + current skills
-- explained/scored recommendation outputs
-- recommendation evidence signals
+```text
+final_score = alpha * semantic + beta * centrality + gamma * recency
+```
 
-Response includes:
+Current default weights:
+
+| Weight | Value |
+| --- | --- |
+| `alpha` | `0.6` |
+| `beta` | `0.25` |
+| `gamma` | `0.15` |
+
+The explainability layer then adds:
+
+- `top_contributing_signals`
+- `explanation_text`
+- publication year and cited-by evidence
+- embedding model and centrality source
+- signal strength buckets for semantic, centrality, and recency
+
+## Knowledge Graph And Ontology Role
+
+ResearchGraph AI uses two complementary graph layers:
+
+| Layer | Role |
+| --- | --- |
+| Neo4j operational graph | Stores the entities and relations used by the live product workflows |
+| Ontology layer | Defines the formal domain schema for research entities and relations |
+
+The current graph model includes nodes such as:
+
+- `UserProfile`
+- `Skill`
+- `Paper`
+- `Topic`
+- `Author`
+
+And relationships that support:
+
+- profile-to-skill mapping
+- paper-to-author and paper-to-topic structure
+- recommendation and exploration context
+
+## Advisor Chat
+
+`POST /api/v1/advisor/chat` provides deterministic advisor responses using system context already stored in the platform. It does **not** rely on an external LLM API.
+
+Current supported intent families include:
+
+- explain my recommendations
+- what should I learn next
+- which paper should I start with first
+- summarize my profile and direction
+- compare top recommendations
+
+The response includes:
+
+- `detected_intent`
+- `answer`
+- optional `supporting_items`
+
+## Skill Gap Analysis
+
+`GET /api/v1/skill-gap` builds a backend-owned skill-gap view from:
+
+- current profile skills
+- recommendation outputs
+- evidence fields attached to recommended papers
+
+Returned data includes:
+
 - `current_skills`
-- `missing_skills` (with confidence + supporting papers)
+- `missing_skills`
 - `suggested_next_skills`
 - `strengths`
 - `gaps_summary`
 
-## 10. Advisor Chat
-`POST /api/v1/advisor/chat` provides lightweight research-advisor responses using existing system data only (no external LLM APIs).
+Each missing skill can include confidence, rationale, and supporting recommendation papers.
 
-Currently supported intent families:
-- explain recommendations
-- what to learn next
-- where to start first
-- summarize profile and direction
-- compare top recommendations
+## Graph Explorer
 
-The endpoint returns:
-- `detected_intent`
-- concise `answer`
-- optional `supporting_items`
-
-## 11. Graph Explorer
-The Graph Explorer page uses Cytoscape.js to present an interactive graph over real backend data.
+The Graph Explorer is a React + Cytoscape.js interface that visualizes backend-derived graph data.
 
 Current capabilities:
-- node color coding by type (`UserProfile`, `Skill`, `Paper`, `Topic`, `Author`)
-- type filters and legend
+
+- type-based filtering
+- node legend
 - click-to-focus neighborhood highlighting
-- fade-out of non-relevant elements on selection
-- fit/reset view and reset selection controls
-- node detail panel with metadata
+- fade-out of unrelated nodes and edges
+- fit view / reset view / clear focus controls
+- node details panel with metadata
 
-Note: graph rendering is currently composed from existing backend endpoints (profile/recommendation/skill-gap/search), not from a dedicated graph API endpoint yet.
+Important implementation note:
 
-## 12. Knowledge Graph + Ontology Role
-Ontology defines core research entities and relations (e.g., `Paper`, `Author`, `Topic`, `Skill`, `UserProfile`).
+> The explorer currently composes graph data from existing backend flows (profile, recommendations, skill gap, and search) rather than using a dedicated graph API endpoint.
 
-Neo4j stores the operational graph used by current features, including profile-skill links and paper-author-topic structures, with recommendation-related embedding and scoring metadata.
+## Local Setup
 
-## 13. Project Structure Overview
-```text
-ResearcherAI/
-├─ backend/
-│  ├─ app/
-│  │  ├─ api/              # API router registration
-│  │  ├─ routers/          # FastAPI endpoint modules
-│  │  ├─ services/         # Profile, ingestion, skill-gap, advisor services
-│  │  ├─ recommendation/   # Semantic/scored/explained recommendation logic
-│  │  ├─ data_ingestion/   # OpenAlex client + normalization
-│  │  ├─ db/               # Neo4j client and schema initialization
-│  │  ├─ ontology/         # Ontology schema + OWL export tools
-│  │  ├─ ai/               # Embedding and extraction modules
-│  │  ├─ models/           # Pydantic models
-│  │  └─ core/             # Settings/config
-│  ├─ requirements.txt
-│  ├─ .env.example
-│  └─ run.py
-├─ frontend/
-│  ├─ src/
-│  │  ├─ app/              # App shell + navigation + shared active user flow
-│  │  ├─ pages/            # Profile, Search, Recommendations, Skill Gap, Advisor, Graph Explorer
-│  │  ├─ features/         # Feature modules, APIs, components
-│  │  ├─ services/         # Shared frontend API config
-│  │  └─ styles/           # Tailwind styles
-│  ├─ .env.example
-│  └─ package.json
-├─ data/
-├─ docs/
-└─ scripts/
-```
-
-## 14. Local Setup Instructions
 ### Prerequisites
+
 - Python 3.11+
 - Node.js 18+
-- Neo4j Community (local)
+- Neo4j Community running locally
 
-### Clone repo
+### Clone The Repository
+
 ```bash
-git clone <https://github.com/MarwanMAlfalah/ResearchAI.git
+git clone https://github.com/MarwanMAlfalah/ResearchAI.git
 cd ResearcherAI
 ```
 
+## Backend Run Instructions
 
-## 15. Backend Run Instructions
 ```bash
 cd backend
 python3 -m venv .venv
@@ -192,18 +282,26 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Set Neo4j credentials in `.env`, then run:
+Update `.env` with your Neo4j credentials and any optional config overrides, then run:
+
 ```bash
 python run.py
 ```
-or:
+
+Or run directly with Uvicorn:
+
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Backend base URL: `http://localhost:8000`
+Backend base URL:
 
-## 16. Frontend Run Instructions
+```text
+http://localhost:8000
+```
+
+## Frontend Run Instructions
+
 ```bash
 cd frontend
 cp .env.example .env
@@ -211,32 +309,67 @@ npm install
 npm run dev
 ```
 
-Frontend URL: `http://localhost:5173`
+Frontend app URL:
 
-## 17. Demo Flow
-1. **Create or load profile** on Profile page (`user_id`, name, interests, skills)
-2. **Search and import papers** from OpenAlex on Search page
-3. **View explained recommendations** on Recommendations page
-4. **Inspect skill gaps** on Skill Gap page
-5. **Interact with Advisor** for deterministic guidance and next-step suggestions
-6. **Explore the graph** on Graph Explorer page to inspect connected entities
+```text
+http://localhost:5173
+```
 
-## 18. Current Limitations
-- Full `CITES` ingestion from OpenAlex references is not implemented yet
-- Graph centrality uses a fallback proxy when citation edges are sparse
-- Skill-gap inference is deterministic/evidence-driven and still heuristic-based
-- Graph Explorer currently composes graph data from multiple endpoints instead of using a dedicated graph endpoint
-- Advanced extraction (spaCy/KeyBERT entity linking into graph) is scaffolded but not fully integrated end-to-end
-- Authentication and multi-tenant user isolation are not implemented
-- Automated test coverage remains limited
+The frontend expects:
 
-## 19. Future Improvements
-- Add full citation-edge ingestion (`CITES`) and richer graph-native centrality
-- Add a dedicated backend graph endpoint for explorer performance and consistency
-- Integrate extraction pipeline deeply (methods, datasets, skills with stronger entity linking)
-- Add link prediction signal (TransE) to recommendation scoring
-- Add automated test suites and CI workflow
-- Add auth/user management for multi-user deployments
+```text
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+```
+
+## Demo Workflow
+
+1. Open the Profile page and create or load a user.
+2. Add interests and skills, then save the profile.
+3. Go to Search & Import and import one or more OpenAlex papers.
+4. Open Recommendations and fetch explained recommendations for the same user.
+5. Review Skill Gap to inspect strengths, missing skills, and suggested next skills.
+6. Use Advisor for grounded follow-up questions.
+7. Open Graph Explorer to inspect the connected entities visually.
+
+## API Reference
+
+Base prefix: `/api/v1`
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Service health check |
+| `GET` | `/health/neo4j` | Neo4j connectivity check |
+| `GET` | `/search/papers` | Search papers via OpenAlex |
+| `POST` | `/import/paper` | Import one normalized paper payload |
+| `POST` | `/import/paper/{openalex_id}` | Import one paper directly from OpenAlex |
+| `POST` | `/import/papers/by-id` | Batch import papers by OpenAlex ID |
+| `POST` | `/user/profile` | Create or update a user profile |
+| `GET` | `/user/profile/{id}` | Get one user profile |
+| `GET` | `/recommend/papers/semantic` | Get semantic recommendations |
+| `GET` | `/recommend/papers/scored` | Get weighted recommendations |
+| `GET` | `/recommend/papers/explained` | Get explained recommendations |
+| `GET` | `/skill-gap` | Get deterministic skill-gap analysis |
+| `POST` | `/advisor/chat` | Get deterministic advisor guidance |
+
+## Current Limitations
+
+- Full `CITES` edge ingestion from OpenAlex references is not implemented yet.
+- Graph centrality falls back to normalized `cited_by_count` when graph-native citation structure is sparse.
+- Skill-gap inference is deterministic and evidence-driven, but still heuristic-based.
+- Graph Explorer currently builds from multiple existing endpoints instead of a dedicated graph endpoint.
+- Advanced extraction and entity-linking capabilities are scaffolded but not fully integrated end to end.
+- Authentication and multi-tenant user isolation are not implemented.
+- Automated test coverage is still limited.
+
+## Future Improvements
+
+- Add full citation-edge ingestion and graph-native centrality.
+- Introduce a dedicated backend graph endpoint for explorer performance and consistency.
+- Deepen the extraction pipeline for methods, datasets, skills, and stronger entity linking.
+- Add richer model signals such as link prediction or graph embeddings.
+- Expand automated tests and CI.
+- Add authentication, user management, and deployment hardening.
 
 ---
-ResearchGraph AI is a modular academic prototype designed for explainable research discovery and extensible knowledge-graph intelligence.
+
+ResearchGraph AI is a portfolio-ready research platform prototype that demonstrates graph-aware ranking, explainable recommendations, ontology-backed modeling, and modern full-stack product execution in one repository.
